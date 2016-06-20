@@ -58,6 +58,7 @@ public class Control_Script : MonoBehaviour {
 
 	public enum minigames {WORK, TRAIN, EXPLORE, NONE};
 	public minigames activeGame;
+	private bool minigameActive;
 
 	public LayerMask mainLayer, wLayer, tLayer, eLayer;
 
@@ -308,8 +309,8 @@ public class Control_Script : MonoBehaviour {
 		}
 
 		UpdateUI();
-		UploadStatisticsToAnalytics ();
-		SaveToXML ();
+//		UploadStatisticsToAnalytics ();
+//		SaveToXML ();
 	}
 
 	public void LoadGameVariables(){
@@ -891,8 +892,12 @@ public class Control_Script : MonoBehaviour {
 	public void StartMinigame(minigames game){
 
 		if (game == activeGame){
+			minigameActive = false;
 			game = minigames.NONE;
+		} else {
+			minigameActive = true;
 		}
+
 		Camera c = Camera.main;
 		switch (game)
 		{
