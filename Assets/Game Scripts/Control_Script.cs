@@ -11,6 +11,7 @@ public class Control_Script : MonoBehaviour {
 	//Setup
 	public static GameObject controlObj;
 	public GameObject mainMenu;
+	public GameObject bottomMenuCanvasObject;
 
 	//Game
 	public bool gameActive;
@@ -42,7 +43,6 @@ public class Control_Script : MonoBehaviour {
 	public enum actions {WORK, TRAIN, EXPLORE, REST};
 	public Slider energySlider;
 	public int jobLevel, jobCXP, jobMXP, jobEXPAdd;
-	private actions lastExecuted;
 
 	//Inventory
 
@@ -59,16 +59,25 @@ public class Control_Script : MonoBehaviour {
 	public enum minigames {WORK, TRAIN, EXPLORE, NONE};
 	public minigames activeGame;
 	private bool minigameActive;
+	public GameObject wMiniObject, tMiniObject, eMiniObject;
 
 	public LayerMask mainLayer, wLayer, tLayer, eLayer;
 
+	private enum controlSchemes {WSCHEME, TSCHEME, ESCHEME, NONE};
+	private controlSchemes activeScheme;
+
+	//Work
+	public GameObject wSphere;
+	public GameObject initBlocker, leftBlocker, rightBlocker, middleBlocker;
+	private float initTimer;
+	public float initTimerMaxStart, initTimerMax;
+	private float ballFalling;
 	//Debug
 	public int invIDMax;
 
 	//Feedback
 	public Text goldAddText, expAddText, levelCurrentText, expCurrentText, feedbackTitleText;
 	public Button redoButton, mainButton;
-	private bool isRedo;
 
 	#region Basic Functions
 
@@ -80,7 +89,6 @@ public class Control_Script : MonoBehaviour {
 		playerObj = Player_Script.playerObj;
 		pScript = playerObj.GetComponent<Player_Script>();
 		gameActive = false;
-		isRedo = false;
 
 		foreach (InventoryObject i in inventory){
 			if (i.itemID > invIDMax){
@@ -110,8 +118,17 @@ public class Control_Script : MonoBehaviour {
 		}
 
 		if (Input.GetKeyDown(KeyCode.Escape)){
-			EndMinigame ();
+			if (minigameActive){
+				EndMinigame ();
+				minigameActive = false;
+			}
 		}
+
+		if (activeScheme == controlSchemes.WSCHEME){
+			WorkInput ();
+			WorkUpdate ();
+		}
+
 	}
 
 	#endregion
@@ -513,8 +530,6 @@ public class Control_Script : MonoBehaviour {
 		UpdateFeedbackWindow(a, expAdd, goldAdd);
 
 		UpdateUI();
-
-		lastExecuted = a;
 	}
 
 	public void UpdateFeedbackWindow(actions a, int expAdd, int goldAdd){
@@ -904,23 +919,110 @@ public class Control_Script : MonoBehaviour {
 		case minigames.WORK:
 			activeGame = minigames.WORK;
 			c.cullingMask = wLayer;
+
+			wMiniObject.SetActive (true);
+
+			tMiniObject.SetActive (false);
+			eMiniObject.SetActive (false);
+
+			activeScheme = controlSchemes.WSCHEME;
+
+			StartWork ();
 			break;
 		case minigames.TRAIN:
 			activeGame = minigames.TRAIN;
 			c.cullingMask = tLayer;
+
+			tMiniObject.SetActive (true);
+
+			wMiniObject.SetActive (false);
+			eMiniObject.SetActive (false);
+
+			activeScheme = controlSchemes.TSCHEME;
 			break;
 		case minigames.EXPLORE:
 			activeGame = minigames.EXPLORE;
 			c.cullingMask = eLayer;
+
+			eMiniObject.SetActive (true);
+
+			wMiniObject.SetActive (false);
+			tMiniObject.SetActive (false);
+
+			activeScheme = controlSchemes.ESCHEME;
 			break;
 		case minigames.NONE:
 			activeGame = minigames.NONE;
 			c.cullingMask = mainLayer;
+
+			eMiniObject.SetActive (false);
+			tMiniObject.SetActive (false);
+			wMiniObject.SetActive (false);
 			break;
 		}
 	}
 
+	public void StartWork(){
+
+		initBlocker.SetActive (true);
+		leftBlocker.SetActive (false);
+		rightBlocker.SetActive (false);
+		middleBlocker.SetActive (false);
+		bottomMenuCanvasObject.SetActive (false);
+
+		initTimerMax = initTimerMaxStart;
+	}
+
+	public void ResetBall(bool match){
+		initBlocker.SetActive (true);
+		leftBlocker.SetActive (false);
+		rightBlocker.SetActive (false);
+		middleBlocker.SetActive (false);
+
+		if (!match){
+			EndMinigame ();
+			wSphere.GetComponent<WSphereScript> ().gravForce = 1;
+			initTimerMax = initTimerMaxStart;
+		} else {
+			wSphere.GetComponent<WSphereScript> ().gravForce += 2;
+		}
+	}
+
+	private void WorkUpdate(){
+		initTimer += Time.deltaTime;
+		if (initTimer >= initTimerMax){
+			initTimer = 0;
+			initTimerMax -= 0.05f;
+			initBlocker.SetActive (false);
+		}
+	}
+
+
+	public void WorkInput(){
+		if (Input.GetKeyDown(KeyCode.A)){
+			leftBlocker.SetActive (true);
+			initBlocker.SetActive (false);
+			rightBlocker.SetActive (false);
+			middleBlocker.SetActive (false);
+		}
+
+		if (Input.GetKeyDown(KeyCode.D)){
+			rightBlocker.SetActive (true);
+			initBlocker.SetActive (false);
+			leftBlocker.SetActive (false);
+			middleBlocker.SetActive (false);
+		}
+
+		if (Input.GetKeyDown(KeyCode.S)){
+			middleBlocker.SetActive (true);
+			initBlocker.SetActive (false);
+			leftBlocker.SetActive (false);
+			rightBlocker.SetActive (false);
+		}
+	}
+
 	public void EndMinigame(){
+		bottomMenuCanvasObject.SetActive (true);
 		SetActiveWindow(windows.NONE);
 		StartMinigame(minigames.NONE);
 		SaveGameVariables ();
