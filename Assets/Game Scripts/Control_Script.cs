@@ -526,8 +526,8 @@ public class Control_Script : MonoBehaviour {
 		}
 
 
-		SetActiveWindow(windows.FEEDBACK);
-		UpdateFeedbackWindow(a, expAdd, goldAdd);
+//		SetActiveWindow(windows.FEEDBACK);
+//		UpdateFeedbackWindow(a, expAdd, goldAdd);
 
 		UpdateUI();
 	}
@@ -952,6 +952,7 @@ public class Control_Script : MonoBehaviour {
 			activeScheme = controlSchemes.ESCHEME;
 			break;
 		case minigames.NONE:
+			minigameActive = false;
 			activeGame = minigames.NONE;
 			c.cullingMask = mainLayer;
 
@@ -985,6 +986,9 @@ public class Control_Script : MonoBehaviour {
 			initTimerMax = initTimerMaxStart;
 		} else {
 			wSphere.GetComponent<WSphereScript> ().gravForce += 2;
+			AddGold (jobLevel);
+			pScript.AddExp (pScript.expAdd);
+			AddJobEXP (jobEXPAdd);
 		}
 	}
 
@@ -1023,9 +1027,12 @@ public class Control_Script : MonoBehaviour {
 
 	public void EndMinigame(){
 		bottomMenuCanvasObject.SetActive (true);
-		SetActiveWindow(windows.NONE);
+		activeScheme = controlSchemes.NONE;
 		StartMinigame(minigames.NONE);
+		SetActiveWindow(windows.FEEDBACK);
+		UpdateFeedbackWindow (actions.WORK, dayXPEarnt, dayGoldEarnt);
 		SaveGameVariables ();
+
 	}
 
 	#endregion 
