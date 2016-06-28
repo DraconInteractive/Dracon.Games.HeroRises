@@ -66,12 +66,15 @@ public class Control_Script : MonoBehaviour {
 	private enum controlSchemes {WSCHEME, TSCHEME, ESCHEME, NONE};
 	private controlSchemes activeScheme;
 
+	private float minigameGoldEarned, minigameXPEarned;
+
 	//Work
 	public GameObject wSphere;
-	public GameObject initBlocker, leftBlocker, rightBlocker, middleBlocker;
+	public GameObject initBlocker, leftBlocker, rightBlocker;
 	private float initTimer;
 	public float initTimerMaxStart, initTimerMax;
 	private float ballFalling;
+
 	//Debug
 	public int invIDMax;
 
@@ -393,6 +396,12 @@ public class Control_Script : MonoBehaviour {
 			quest.LoadQuestStatus();
 		}
 
+		if (dayTime < 1){
+			actionWindow.GetComponent<AWinScript>().SetEnergy(true);
+		} else {
+			actionWindow.GetComponent<AWinScript>().SetEnergy(false);
+		}
+
 		UpdateUI();
 
 	}
@@ -507,11 +516,6 @@ public class Control_Script : MonoBehaviour {
 			StartMinigame (minigames.TRAIN);
 			break;
 		case actions.WORK:
-			expAdd = Mathf.RoundToInt (pScript.expAdd * 0.5f + jobEXPAdd * 0.5f);
-			goldAdd = Mathf.RoundToInt (jobLevel * 2.5f);
-			pScript.AddExp (expAdd);
-			AddGold (goldAdd);
-			AddJobEXP (jobEXPAdd);
 			StartMinigame (minigames.WORK);
 			break;
 		}
@@ -968,27 +972,31 @@ public class Control_Script : MonoBehaviour {
 		initBlocker.SetActive (true);
 		leftBlocker.SetActive (false);
 		rightBlocker.SetActive (false);
-		middleBlocker.SetActive (false);
 		bottomMenuCanvasObject.SetActive (false);
 
 		initTimerMax = initTimerMaxStart;
+
+		minigameGoldEarned = 0;
+		minigameXPEarned = 0;
 	}
 
 	public void ResetBall(bool match){
-		initBlocker.SetActive (true);
+
 		leftBlocker.SetActive (false);
 		rightBlocker.SetActive (false);
-		middleBlocker.SetActive (false);
 
 		if (!match){
+			AddGold ((int)minigameGoldEarned);
+			pScript.AddExp ((int)minigameXPEarned);
 			EndMinigame ();
 			wSphere.GetComponent<WSphereScript> ().gravForce = 1;
 			initTimerMax = initTimerMaxStart;
 		} else {
 			wSphere.GetComponent<WSphereScript> ().gravForce += 2;
-			AddGold (jobLevel);
-			pScript.AddExp (pScript.expAdd);
+			minigameGoldEarned += jobLevel;
+			minigameXPEarned += pScript.expAdd;
 			AddJobEXP (jobEXPAdd);
+			print ("Gold: " + minigameGoldEarned + ", XP: " + minigameXPEarned);
 		}
 	}
 
@@ -1007,18 +1015,15 @@ public class Control_Script : MonoBehaviour {
 			leftBlocker.SetActive (true);
 			initBlocker.SetActive (false);
 			rightBlocker.SetActive (false);
-			middleBlocker.SetActive (false);
 		}
 
 		if (Input.GetKeyDown(KeyCode.D)){
 			rightBlocker.SetActive (true);
 			initBlocker.SetActive (false);
 			leftBlocker.SetActive (false);
-			middleBlocker.SetActive (false);
 		}
 
 		if (Input.GetKeyDown(KeyCode.S)){
-			middleBlocker.SetActive (true);
 			initBlocker.SetActive (false);
 			leftBlocker.SetActive (false);
 			rightBlocker.SetActive (false);
@@ -1030,7 +1035,7 @@ public class Control_Script : MonoBehaviour {
 		activeScheme = controlSchemes.NONE;
 		StartMinigame(minigames.NONE);
 		SetActiveWindow(windows.FEEDBACK);
-		UpdateFeedbackWindow (actions.WORK, dayXPEarnt, dayGoldEarnt);
+		UpdateFeedbackWindow (actions.WORK, (int)minigameXPEarned, (int)minigameGoldEarned);
 		SaveGameVariables ();
 
 	}
