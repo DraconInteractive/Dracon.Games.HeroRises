@@ -75,6 +75,8 @@ public class Control_Script : MonoBehaviour {
 	public float initTimerMaxStart, initTimerMax;
 	private float ballFalling;
 
+	//Train
+	public GameObject trainArrow;
 	//Debug
 	public int invIDMax;
 
@@ -130,6 +132,10 @@ public class Control_Script : MonoBehaviour {
 		if (activeScheme == controlSchemes.WSCHEME){
 			WorkInput ();
 			WorkUpdate ();
+		}
+
+		if (activeScheme == controlSchemes.TSCHEME){
+			TrainInput ();
 		}
 
 	}
@@ -966,7 +972,7 @@ public class Control_Script : MonoBehaviour {
 			break;
 		}
 	}
-
+	#region work
 	public void StartWork(){
 
 		initBlocker.SetActive (true);
@@ -1030,6 +1036,57 @@ public class Control_Script : MonoBehaviour {
 		}
 	}
 
+	#endregion
+
+	#region train
+
+	private void StartTrain (){
+		ArrowScript a = trainArrow.GetComponent<ArrowScript> ();
+
+		int i = Mathf.RoundToInt(Random.Range (0.0f, 3.0f));
+		switch (i)
+		{
+		case 0:
+			a.SetDirection ("up");
+			break;
+		case 1:
+			a.SetDirection ("down");
+			break;
+		case 2:
+			a.SetDirection ("left");
+			break;
+		case 3:
+			a.SetDirection ("right");
+			break;
+		}
+
+		minigameGoldEarned = 0;
+		minigameXPEarned = 0;
+	}
+
+	private void TrainInput(){
+
+		ArrowScript a = trainArrow.GetComponent<ArrowScript> ();
+
+		if (Input.GetKeyDown(KeyCode.W)){
+			a.SetDirection ("up");
+		}
+
+		if (Input.GetKeyDown(KeyCode.S)){
+			a.SetDirection ("down");
+		}
+
+		if (Input.GetKeyDown(KeyCode.A)){
+			a.SetDirection ("left");
+		}
+
+		if (Input.GetKeyDown(KeyCode.D)){
+			a.SetDirection ("right");
+		}
+
+	}
+
+	#endregion
 	public void EndMinigame(){
 		bottomMenuCanvasObject.SetActive (true);
 		activeScheme = controlSchemes.NONE;
