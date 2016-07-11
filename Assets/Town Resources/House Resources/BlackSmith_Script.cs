@@ -11,11 +11,6 @@ public class BlackSmith_Script : MonoBehaviour {
 		startingColor = myMaterial.color;
 		controlObj = Control_Script.controlObj;
 	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
 
 	void OnMouseEnter(){
 		myMaterial.color = startingColor + new Color(0.25f,0.25f,0.25f);

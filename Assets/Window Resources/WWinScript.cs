@@ -4,6 +4,7 @@ using System.Collections;
 
 public class WWinScript : MonoBehaviour {
 	public Button sabButton, twoHButton, dwButton, mtButton;
+	public Button toMainButton;
 	// Use this for initialization
 	void Start () {
 		GameObject controlObj = Control_Script.controlObj;
@@ -18,6 +19,8 @@ public class WWinScript : MonoBehaviour {
 		dwButton.onClick.AddListener(() => c.DWButton());
 
 		mtButton.onClick.AddListener(() => c.MTBUTTON());
+
+		toMainButton.onClick.AddListener (() => c.SetActiveWindow (Control_Script.windows.NONE));
 	}
 		
 }

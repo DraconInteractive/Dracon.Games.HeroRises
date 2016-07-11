@@ -7,6 +7,7 @@ public class FWinScript : MonoBehaviour {
 	public GameObject controlObj;
 	public Control_Script cScript;
 	public Button redoButton, mainButton;
+	public Button toMainButton;
 
 	void Start () {
 		controlObj = Control_Script.controlObj;
@@ -23,5 +24,6 @@ public class FWinScript : MonoBehaviour {
 
 		redoButton.onClick.AddListener(() => cScript.RedoButton());
 		mainButton.onClick.AddListener(() => cScript.MainButton());
+		toMainButton.onClick.AddListener (() => cScript.SetActiveWindow (Control_Script.windows.NONE));
 	}
 }

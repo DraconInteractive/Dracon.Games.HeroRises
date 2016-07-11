@@ -6,6 +6,7 @@ public class AWinScript : MonoBehaviour {
 
 	public Button workButton, trainButton, exploreButton, restButton;
 	public Slider energySlider;
+	public Button toMainButton;
 
 	private Control_Script cScript;
 
@@ -22,13 +23,14 @@ public class AWinScript : MonoBehaviour {
 		trainButton.onClick.AddListener(() => DoTrainAction());
 		exploreButton.onClick.AddListener(() => DoExploreAction());
 		restButton.onClick.AddListener(() => DoRestAction());
+		toMainButton.onClick.AddListener (() => GoToMain ());
 
 		gameObject.SetActive(false);
 	}
 	
 	// Update is called once per frame
-	void Update () {
-	
+	private void GoToMain(){
+		cScript.SetActiveWindow (Control_Script.windows.NONE);
 	}
 
 	private void DoWorkAction(){

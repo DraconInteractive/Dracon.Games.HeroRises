@@ -7,7 +7,7 @@ public class WSphereScript : MonoBehaviour {
 	public enum ColorType {Y, G, B};
 	public string myColor;
 	public Vector3 grav;
-	public float gravForce;
+	public float gravForce, initGravForce;
 	private Rigidbody rb;
 	// Use this for initialization
 	void Start () {
@@ -31,7 +31,7 @@ public class WSphereScript : MonoBehaviour {
 			break;
 		}
 
-		gravForce = 1;
+		gravForce = initGravForce;
 		SetGrav ();
 
 	}

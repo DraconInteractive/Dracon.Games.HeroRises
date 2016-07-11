@@ -68,15 +68,20 @@ public class Control_Script : MonoBehaviour {
 
 	private float minigameGoldEarned, minigameXPEarned;
 
+	private Camera mainCam;
+	private Vector3 mainCamStartPos;
+
 	//Work
 	public GameObject wSphere;
 	public GameObject initBlocker, leftBlocker, rightBlocker;
-	private float initTimer;
-	public float initTimerMaxStart, initTimerMax;
+	private float wInitTimer;
+	public float wInitTimerMaxStart, wInitTimerMax;
 	private float ballFalling;
 
 	//Train
 	public GameObject trainArrow;
+	public float trainTimerCurrent, trainTimerMax, trainTimerMaxStart;
+	public Slider timeSlider;
 	//Debug
 	public int invIDMax;
 
@@ -88,6 +93,8 @@ public class Control_Script : MonoBehaviour {
 
 	void Awake () {
 		controlObj = this.gameObject;
+		mainCam = Camera.main;
+		mainCamStartPos = mainCam.transform.position;
 	}
 	// Use this for initialization
 	void Start () {
@@ -136,6 +143,7 @@ public class Control_Script : MonoBehaviour {
 
 		if (activeScheme == controlSchemes.TSCHEME){
 			TrainInput ();
+			TrainUpdate ();
 		}
 
 	}
@@ -517,8 +525,6 @@ public class Control_Script : MonoBehaviour {
 			FinishDay();
 			break;
 		case actions.TRAIN:
-			expAdd = Mathf.RoundToInt (pScript.expAdd * 2.5f);
-			pScript.AddExp (expAdd);
 			StartMinigame (minigames.TRAIN);
 			break;
 		case actions.WORK:
@@ -949,6 +955,8 @@ public class Control_Script : MonoBehaviour {
 			eMiniObject.SetActive (false);
 
 			activeScheme = controlSchemes.TSCHEME;
+
+
 			break;
 		case minigames.EXPLORE:
 			activeGame = minigames.EXPLORE;
@@ -974,13 +982,13 @@ public class Control_Script : MonoBehaviour {
 	}
 	#region work
 	public void StartWork(){
-
+		mainCam.transform.position += mainCam.transform.forward * 2;
 		initBlocker.SetActive (true);
 		leftBlocker.SetActive (false);
 		rightBlocker.SetActive (false);
 		bottomMenuCanvasObject.SetActive (false);
 
-		initTimerMax = initTimerMaxStart;
+		wInitTimerMax = wInitTimerMaxStart;
 
 		minigameGoldEarned = 0;
 		minigameXPEarned = 0;
@@ -995,8 +1003,8 @@ public class Control_Script : MonoBehaviour {
 			AddGold ((int)minigameGoldEarned);
 			pScript.AddExp ((int)minigameXPEarned);
 			EndMinigame ();
-			wSphere.GetComponent<WSphereScript> ().gravForce = 1;
-			initTimerMax = initTimerMaxStart;
+			wSphere.GetComponent<WSphereScript> ().gravForce = wSphere.GetComponent<WSphereScript>().initGravForce;
+			wInitTimerMax = wInitTimerMaxStart;
 		} else {
 			wSphere.GetComponent<WSphereScript> ().gravForce += 2;
 			minigameGoldEarned += jobLevel;
@@ -1007,10 +1015,10 @@ public class Control_Script : MonoBehaviour {
 	}
 
 	private void WorkUpdate(){
-		initTimer += Time.deltaTime;
-		if (initTimer >= initTimerMax){
-			initTimer = 0;
-			initTimerMax -= 0.05f;
+		wInitTimer += Time.deltaTime;
+		if (wInitTimer >= wInitTimerMax){
+			wInitTimer = 0;
+			wInitTimerMax -= 0.05f;
 			initBlocker.SetActive (false);
 		}
 	}
@@ -1041,6 +1049,7 @@ public class Control_Script : MonoBehaviour {
 	#region train
 
 	private void StartTrain (){
+		bottomMenuCanvasObject.SetActive (false);
 		ArrowScript a = trainArrow.GetComponent<ArrowScript> ();
 
 		int i = Mathf.RoundToInt(Random.Range (0.0f, 3.0f));
@@ -1062,32 +1071,115 @@ public class Control_Script : MonoBehaviour {
 
 		minigameGoldEarned = 0;
 		minigameXPEarned = 0;
+		trainTimerMax = trainTimerMaxStart;
+
+		ResetTrainTimer ();
 	}
 
 	private void TrainInput(){
 
 		ArrowScript a = trainArrow.GetComponent<ArrowScript> ();
-
+		float b = trainTimerMax * 0.05f;
 		if (Input.GetKeyDown(KeyCode.W)){
-			a.SetDirection ("up");
+			CheckTrainInput ("up");
+			trainTimerCurrent = 0;
+			trainTimerMax -= b;
 		}
 
 		if (Input.GetKeyDown(KeyCode.S)){
-			a.SetDirection ("down");
+			CheckTrainInput ("down");
+			trainTimerCurrent = 0;
+			trainTimerMax -= b;
 		}
 
 		if (Input.GetKeyDown(KeyCode.A)){
-			a.SetDirection ("left");
+			CheckTrainInput ("left");
+			trainTimerCurrent = 0;
+			trainTimerMax -= b;
 		}
 
 		if (Input.GetKeyDown(KeyCode.D)){
-			a.SetDirection ("right");
+			CheckTrainInput ("right");
+			trainTimerCurrent = 0;
+			trainTimerMax -= b;
+		}
+	}
+
+	private void TrainUpdate(){
+		trainTimerCurrent += Time.deltaTime;
+
+		if (trainTimerCurrent >= trainTimerMax){
+			trainTimerCurrent = 0;
+			TrainFail ();
 		}
 
+		timeSlider.value = trainTimerMax - trainTimerCurrent;
+//		wInitTimer += Time.deltaTime;
+//		if (wInitTimer >= wInitTimerMax){
+//			wInitTimer = 0;
+//			wInitTimerMax -= 0.05f;
+//			initBlocker.SetActive (false);
+//		}
+	}
+
+	private void CheckTrainInput(string d){
+		ArrowScript a = trainArrow.GetComponent<ArrowScript> ();
+		switch (d)
+		{
+		case "up":
+			if (a.myDirection == ArrowScript.direction.up){
+				TrainSuccess ();
+			} else {
+				TrainFail ();
+			}
+			break;
+		case "down":
+			if (a.myDirection == ArrowScript.direction.down){
+				TrainSuccess ();
+			} else {
+				TrainFail ();
+			}
+			break;
+		case "left":
+			if (a.myDirection == ArrowScript.direction.left){
+				TrainSuccess ();
+			} else {
+				TrainFail ();
+			}
+			break;
+		case "right":
+			if (a.myDirection == ArrowScript.direction.right){
+				TrainSuccess ();
+			} else {
+				TrainFail ();
+			}
+			break;
+		}
+	}
+
+	private void TrainSuccess(){
+		minigameXPEarned += pScript.expAdd * 2.5f;
+		trainArrow.GetComponent<ArrowScript> ().SetRandomDirection ();
+		ResetTrainTimer ();
+	}
+
+	private void TrainFail(){
+		ResetTrainTimer ();
+		trainTimerMax = trainTimerMaxStart;
+		AddGold ((int)minigameGoldEarned);
+		pScript.AddExp ((int)minigameXPEarned);
+		EndMinigame ();
+	}
+
+	private void ResetTrainTimer(){
+		timeSlider.maxValue = trainTimerMax;
+		timeSlider.minValue = 0;
+		timeSlider.value = trainTimerMax - trainTimerCurrent;
 	}
 
 	#endregion
 	public void EndMinigame(){
+		mainCam.transform.position = mainCamStartPos;
 		bottomMenuCanvasObject.SetActive (true);
 		activeScheme = controlSchemes.NONE;
 		StartMinigame(minigames.NONE);

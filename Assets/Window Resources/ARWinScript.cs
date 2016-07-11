@@ -7,6 +7,7 @@ public class ARWinScript : MonoBehaviour {
 	private GameObject controlObj;
 	private Control_Script c;
 	public Button tOneA, tTwoA, tThreeA, mtButton;
+	public Button toMainButton;
 
 	// Use this for initialization
 	void Start () {
@@ -21,6 +22,7 @@ public class ARWinScript : MonoBehaviour {
 		tTwoA.onClick.AddListener(() => c.TTwoAButton());
 		tThreeA.onClick.AddListener(() => c.TThreeAButton());
 		mtButton.onClick.AddListener(() => c.MTBUTTON());
+		toMainButton.onClick.AddListener (() => c.SetActiveWindow (Control_Script.windows.NONE));
 	}
 	
 
