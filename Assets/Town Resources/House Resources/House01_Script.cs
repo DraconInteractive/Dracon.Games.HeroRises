@@ -1,28 +1,37 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class House01_Script : MonoBehaviour {
-	Material myMaterial;
-	Color startingColor;
+	Material[] myMaterials;
+	Color[] startingColor;
 	GameObject controlObj;
 	// Use this for initialization
 	void Start () {
-		myMaterial = GetComponent<MeshRenderer>().material;
-		startingColor = myMaterial.color;
+		myMaterials = GetComponent<MeshRenderer>().materials;
+		startingColor = new Color[myMaterials.Length];
+		foreach (Color c in startingColor){
+			startingColor[System.Array.IndexOf(startingColor, c)] = myMaterials [System.Array.IndexOf (startingColor, c)].color;
+		}
 		controlObj = Control_Script.controlObj;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-	
+		
 	}
 
 	void OnMouseEnter(){
-		myMaterial.color = startingColor + new Color(0.25f,0.25f,0.25f);
+		foreach (Material m in myMaterials){
+			m.color = startingColor[System.Array.IndexOf(myMaterials, m)] + new Color(0.25f,0.25f,0.25f);
+		}
+
 	}
 
 	public void OnMouseExit(){
-		myMaterial.color = startingColor;
+		foreach (Material m in myMaterials){
+			m.color = startingColor[System.Array.IndexOf(myMaterials, m)];
+		}
 	}
 
 	void OnMouseDown(){

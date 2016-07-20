@@ -6,7 +6,7 @@ public class Player_Script : MonoBehaviour {
 	public static GameObject playerObj;
 	public GameObject controlObj;
 	public Control_Script cScript;
-	public float rotationAPS;
+//	public float rotationAPS;
 
 	public string playerName;
 	public int level, currentExp, maxExp, expAdd;
@@ -36,6 +36,13 @@ public class Player_Script : MonoBehaviour {
 				cScript.SetQuestActive("QU01");
 			} else {
 				print ("Control Script not properly accessed");
+
+				cScript = Control_Script.controlObj.GetComponent<Control_Script> ();
+				if (cScript != null){
+					cScript.SetQuestActive("QU01");
+				} else {
+					print ("Control Script not able to be accessed");
+				}
 			}
 		}
 	}

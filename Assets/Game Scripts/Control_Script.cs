@@ -20,6 +20,10 @@ public class Control_Script : MonoBehaviour {
 	public int dayGoldEarnt;
 	public int dayXPEarnt;
 
+	public GameObject adPanel;
+	public Button adButton;
+
+
 	//Windows
 	public Bottom_Menu_Script bottomMenu;
 	public GameObject characterWindow, actionWindow, menuWindow, weaponsWindow, armourWindow, feedbackWindow, mtWindow;
@@ -35,12 +39,13 @@ public class Control_Script : MonoBehaviour {
 	private GameObject playerObj;
 	private Player_Script pScript;
 
-	private InventoryObject eWeapon, eArmour;
-	private int armourStage;
+	public InventoryObject eWeapon, eArmour;
+	public int armourStage, maxArmourStage;
+	public int weaponStage, maxWeaponStage;
 
 	//Actions
 
-	public enum actions {WORK, TRAIN, EXPLORE, REST};
+	public enum actions {WORK, TRAIN, EXPLORE, REST, ADVERTISEMENT};
 	public Slider energySlider;
 	public int jobLevel, jobCXP, jobMXP, jobEXPAdd;
 
@@ -48,6 +53,9 @@ public class Control_Script : MonoBehaviour {
 
 	public InventoryObject[] inventory;
 	public InventoryObject goldObj;
+	public InventoryObject gemObj;
+
+
 
 	//Quest
 
@@ -82,6 +90,11 @@ public class Control_Script : MonoBehaviour {
 	public GameObject trainArrow;
 	public float trainTimerCurrent, trainTimerMax, trainTimerMaxStart;
 	public Slider timeSlider;
+
+	//Explore
+	public playerObjScript epScript;
+	public GameObject areaControl;
+	public GameObject[] areaObjects;
 	//Debug
 	public int invIDMax;
 
@@ -129,9 +142,34 @@ public class Control_Script : MonoBehaviour {
 			SaveGameVariables();
 		}
 
+		if (Input.GetKeyDown(KeyCode.F7)){
+			AddGold (10000);
+			UpdateUI ();
+		}
+
+		if (Input.GetKeyDown(KeyCode.F8)){
+			AddGem (1);
+			UpdateUI ();
+		}
+
 		if (Input.GetKeyDown(KeyCode.Escape)){
 			if (minigameActive){
-				EndMinigame ();
+				switch (activeGame)
+				{
+				case minigames.EXPLORE:
+					EndMinigame (actions.EXPLORE);
+					break;
+				case minigames.WORK:
+					EndMinigame (actions.WORK);
+					break;
+				case minigames.TRAIN:
+					EndMinigame (actions.TRAIN);
+					break;
+				case minigames.NONE:
+					EndMinigame (actions.WORK);
+					break;
+				}
+
 				minigameActive = false;
 			}
 		}
@@ -144,6 +182,11 @@ public class Control_Script : MonoBehaviour {
 		if (activeScheme == controlSchemes.TSCHEME){
 			TrainInput ();
 			TrainUpdate ();
+		}
+
+		if (activeScheme == controlSchemes.ESCHEME){
+			ExploreUpdate ();
+			ExploreInput();
 		}
 
 	}
@@ -258,7 +301,9 @@ public class Control_Script : MonoBehaviour {
 		c.expText.text = "EXP: " + pScript.currentExp.ToString() + " / " + pScript.maxExp.ToString();
 		c.dayText.text = "Day: " + day.ToString();
 		c.jobLevelText.text = "Job Level: " + jobLevel.ToString();
-		bottomMenu.goldText.text = "Gold: " + GetInventoryItem("Gold").itemQuantity;
+		c.weaponText.text = "Weapon: " + eWeapon.itemName;
+		c.armourText.text = "Armour: " + eArmour.itemName;
+		bottomMenu.goldText.text = "Gold: " + goldObj.itemQuantity.ToString() + "   |   Gems: " + gemObj.itemQuantity.ToString();
 
 		energySlider.value = dayTime;
 
@@ -325,6 +370,7 @@ public class Control_Script : MonoBehaviour {
 		PlayerPrefs.SetInt("EWIndex", eWeapon.itemID);
 		PlayerPrefs.SetInt("EAIndex", eArmour.itemID);
 		PlayerPrefs.SetInt("ArmourStage", armourStage);
+		PlayerPrefs.SetInt ("WeaponStage", weaponStage);
 
 		PlayerPrefs.SetInt("Day", day);
 		PlayerPrefs.SetFloat("DayTime", dayTime);
@@ -379,7 +425,8 @@ public class Control_Script : MonoBehaviour {
 		pScript.currentExp = PlayerPrefs.GetInt("PlayerCEXP");
 		pScript.maxExp = PlayerPrefs.GetInt("PlayerMEXP");
 		pScript.expAdd = PlayerPrefs.GetInt("ExpAdd");
-		armourStage = PlayerPrefs.GetInt("ArmourStage");
+		armourStage = PlayerPrefs.GetInt("ArmourStage", 1);
+		weaponStage = PlayerPrefs.GetInt ("WeaponStage", 1);
 
 		int eIndex = PlayerPrefs.GetInt("EWIndex");
 		int aIndex = PlayerPrefs.GetInt("EAIndex");
@@ -434,6 +481,9 @@ public class Control_Script : MonoBehaviour {
 		jobMXP = 10;
 		jobEXPAdd = 2;
 		armourStage = 1;
+		weaponStage = 1;
+		maxArmourStage = 5;
+		maxWeaponStage = 2;
 
 		foreach (InventoryObject item in inventory){
 			item.ResetItemVariables();
@@ -509,16 +559,11 @@ public class Control_Script : MonoBehaviour {
 
 	public void ExecuteAction(actions a){
 		
-		dayTime += 0.25f;
-		int expAdd = 0;
-		int goldAdd = 0;
+		dayTime += 0.1f;
+
 		switch (a)
 		{
 		case actions.EXPLORE:
-			expAdd = pScript.expAdd;
-			pScript.AddExp (pScript.expAdd);
-			goldAdd = Mathf.RoundToInt (pScript.level / Random.Range (0.1f, 2.0f));
-			AddGold (goldAdd);
 			StartMinigame (minigames.EXPLORE);
 			break;
 		case actions.REST:
@@ -532,18 +577,19 @@ public class Control_Script : MonoBehaviour {
 			break;
 		}
 
-		dayGoldEarnt += goldAdd;
-		dayXPEarnt += expAdd;
+//		dayGoldEarnt += goldAdd;
+//		dayXPEarnt += expAdd;
+
 
 		if (dayTime < 1){
 			actionWindow.GetComponent<AWinScript>().SetEnergy(true);
 		} else {
 			actionWindow.GetComponent<AWinScript>().SetEnergy(false);
 		}
+		if (a != actions.REST){
+			SetActiveWindow (windows.NONE);
+		}
 
-
-//		SetActiveWindow(windows.FEEDBACK);
-//		UpdateFeedbackWindow(a, expAdd, goldAdd);
 
 		UpdateUI();
 	}
@@ -558,6 +604,12 @@ public class Control_Script : MonoBehaviour {
 			levelCurrentText.text = "Experience Earnt Today: " + dayXPEarnt;
 			dayGoldEarnt = 0;
 			dayXPEarnt = 0;
+		} else if (a == actions.ADVERTISEMENT){
+			feedbackTitleText.text = a.ToString();
+			expAddText.text = "Experience Earnt: " + expAdd.ToString();
+			goldAddText.text = "Gold Earnt: " + goldAdd.ToString() + " (+150%)";
+			expCurrentText.text = "Current Experience: " + pScript.currentExp.ToString() + " / " + pScript.maxExp.ToString();
+			levelCurrentText.text = "Current Level: " + pScript.level.ToString();
 		} else {
 			feedbackTitleText.text = a.ToString();
 			expAddText.text = "Experience Earnt: " + expAdd.ToString();
@@ -573,6 +625,10 @@ public class Control_Script : MonoBehaviour {
 		dayTime = 0;
 		SaveGameVariables();
 		UpdateUI();
+
+		SetActiveWindow (windows.FEEDBACK);
+		UpdateFeedbackWindow (actions.REST, dayGoldEarnt, dayXPEarnt);
+
 	}
 
 	#endregion
@@ -588,8 +644,14 @@ public class Control_Script : MonoBehaviour {
 		}
 	}
 
-	void AddGold(int amount){
+	public void AddGold(int amount){
 		goldObj.itemQuantity += amount;
+		goldObj.SaveItemDetails ();
+	}
+
+	public void AddGem(int amount) {
+		gemObj.itemQuantity += amount;
+		goldObj.SaveItemDetails ();
 	}
 
 	InventoryObject GetInventoryItem(string iName){
@@ -606,128 +668,70 @@ public class Control_Script : MonoBehaviour {
 
 	#region equipmentButtons
 	public void SabButton () {
+		bool itemBought = false;
 		foreach (InventoryObject i in inventory){
-			if (i.type == InventoryObject.itemTypes.SAB){
-				if (pScript.level > 0 && pScript.level <= 10){
-					if (i.stage == 1){
-						if (eWeapon != i){
-							if (goldObj.itemQuantity > i.cost){
-								eWeapon = i;
-								AddGold(i.cost * -1);
-								UpdateUI();
-							} else {
-								print ("Not enough Gold");
-							}
-						} else {
-							print ("Weapon Already Equipped");
-						}
-					} else {
-						print ("Stage not initialised");
+			if (!itemBought){
+				if (i.type == InventoryObject.itemTypes.SAB && i.stage == weaponStage && eWeapon != i && goldObj.itemQuantity > i.cost){
+					eWeapon = i;
+					AddGold (i.cost * -1);
+
+					print ("Equipped: " + eWeapon.itemName + " as weapon");
+					if (weaponStage != maxWeaponStage){
+						weaponStage++;
 					}
-				} else if (pScript.level > 10 && pScript.level <= 20) {
-					if (i.stage == 2){
-						if (eWeapon != i){
-							if (goldObj.itemQuantity > i.cost){
-								eWeapon = i;
-								AddGold(i.cost * -1);
-								UpdateUI();
-							} else {
-								print ("Not enough Gold");
-							}
-						} else {
-							print ("Weapon Already Equipped");
-						}
-					} else {
-						print ("Stage not initialised");
-					}
-				} else {
-					print ("Player level out of bounds");
+					itemBought = true;
+
+					UpdateUI ();
 				}
 			}
+
+
 		}
 	}
 
 	public void TwoHButton () {
+		bool itemBought = false;
 		foreach (InventoryObject i in inventory){
-			if (i.type == InventoryObject.itemTypes.TWOH){
-				if (pScript.level > 0 && pScript.level <= 10){
-					if (i.stage == 1){
-						if (eWeapon != i){
-							if (goldObj.itemQuantity > i.cost){
-								eWeapon = i;
-								AddGold(i.cost * -1);
-								UpdateUI();
-							} else {
-								print ("Not enough Gold");
-							}
-						} else {
-							print ("Weapon Already Equipped");
-						}
-					} else {
-						print ("Stage not initialised");
+			if (!itemBought){
+				if (i.type == InventoryObject.itemTypes.TWOH && i.stage == weaponStage && eWeapon != i && goldObj.itemQuantity > i.cost){
+					eWeapon = i;
+					AddGold (i.cost * -1);
+
+					print ("Equipped: " + eWeapon.itemName + " as weapon");
+					if (weaponStage != maxWeaponStage){
+						weaponStage++;
 					}
-				} else if (pScript.level > 10 && pScript.level <= 20) {
-					if (i.stage == 2){
-						if (eWeapon != i){
-							if (goldObj.itemQuantity > i.cost){
-								eWeapon = i;
-								AddGold(i.cost * -1);
-								UpdateUI();
-							} else {
-								print ("Not enough Gold");
-							}
-						} else {
-							print ("Weapon Already Equipped");
-						}
-					} else {
-						print ("Stage not initialised");
-					}
-				} else {
-					print ("Player level out of bounds");
+
+					itemBought = true;
+
+					UpdateUI ();
 				}
+
 			}
+
 		}
 	}
 
 	public void DWButton () {
+		bool itemBought = false;
 		foreach (InventoryObject i in inventory){
-			if (i.type == InventoryObject.itemTypes.DW){
-				if (pScript.level > 0 && pScript.level <= 10){
-					if (i.stage == 1){
-						if (eWeapon != i){
-							if (goldObj.itemQuantity > i.cost){
-								eWeapon = i;
-								AddGold(i.cost * -1);
-								UpdateUI();
-							} else {
-								print ("Not enough Gold");
-							}
-						} else {
-							print ("Weapon Already Equipped");
-						}
-					} else {
-						print ("Stage not initialised");
+			if (!itemBought){
+				if (i.type == InventoryObject.itemTypes.DW && i.stage == weaponStage && eWeapon != i && goldObj.itemQuantity > i.cost){
+					eWeapon = i;
+					AddGold (i.cost * -1);
+
+					print ("Equipped: " + eWeapon.itemName + " as weapon");
+					if (weaponStage != maxWeaponStage){
+						weaponStage++;
 					}
-				} else if (pScript.level > 10 && pScript.level <= 20) {
-					if (i.stage == 2){
-						if (eWeapon != i){
-							if (goldObj.itemQuantity > i.cost){
-								eWeapon = i;
-								AddGold(i.cost * -1);
-								UpdateUI();
-							} else {
-								print ("Not enough Gold");
-							}
-						} else {
-							print ("Weapon Already Equipped");
-						}
-					} else {
-						print ("Stage not initialised");
-					}
-				} else {
-					print ("Player level out of bounds");
+
+					itemBought = true;
+
+					UpdateUI ();
 				}
 			}
+
+
 		}
 	}
 
@@ -740,8 +744,10 @@ public class Control_Script : MonoBehaviour {
 						if (goldObj.itemQuantity > i.cost){
 							if (eArmour != i){
 								eArmour = i;
-								goldObj.itemQuantity -= i.cost;
-								armourStage = i.stage + 1;
+								AddGold (i.cost * -1);
+								if (i.stage + 1 <= maxArmourStage){
+									armourStage = i.stage + 1;
+								}
 								print (eArmour.itemName);
 								UpdateUI();
 								itemBought = true;
@@ -768,8 +774,10 @@ public class Control_Script : MonoBehaviour {
 						if (goldObj.itemQuantity > i.cost){
 							if (eArmour != i){
 								eArmour = i;
-								goldObj.itemQuantity -= i.cost;
-								armourStage = i.stage + 1;
+								AddGold (i.cost * -1);
+								if (i.stage + 1 != maxArmourStage){
+									armourStage = i.stage + 1;
+								}
 								print (eArmour.itemName);
 								UpdateUI();
 								itemBought = true;
@@ -795,8 +803,11 @@ public class Control_Script : MonoBehaviour {
 						if (goldObj.itemQuantity > i.cost){
 							if (eArmour != i){
 								eArmour = i;
-								goldObj.itemQuantity -= i.cost;
-								armourStage = i.stage + 1;
+								AddGold (i.cost * -1);
+								if (i.stage + 1 != maxArmourStage){
+									armourStage = i.stage + 1;
+								}
+
 								print (eArmour.itemName);
 								UpdateUI();
 								itemBought = true;
@@ -813,75 +824,91 @@ public class Control_Script : MonoBehaviour {
 	}
 
 	private void UpdateEquipmentButtonUI () {
+		InventoryObject aOne = null;
+		InventoryObject aTwo = null;
+		InventoryObject aThree = null;
+		InventoryObject wOne = null;
+		InventoryObject wTwo = null;
+		InventoryObject wThree = null;
+
 		foreach (InventoryObject i in inventory){
-			if (i.type == InventoryObject.itemTypes.SAB){
-				if (pScript.level > 0 && pScript.level <= 10){
-					switch (i.stage)
-					{
-					case 1:
-						sabButton.transform.GetChild(0).gameObject.GetComponent<Text>().text = i.itemName;
-						break;
-					}
-				} else if (pScript.level > 10 && pScript.level <= 20){
-					switch (i.stage)
-					{
-					case 2:
-						sabButton.transform.GetChild(0).gameObject.GetComponent<Text>().text = i.itemName;
-						break;
-					}
+			if (i.type == InventoryObject.itemTypes.SAB) {
+				if (i.stage == weaponStage){
+					wOne = i;
 				}
-			}
-
-			if (i.type == InventoryObject.itemTypes.TWOH){
-				if (pScript.level > 0 && pScript.level <= 10){
-					switch (i.stage)
-					{
-					case 1:
-						twoHButton.transform.GetChild(0).gameObject.GetComponent<Text>().text = i.itemName;
-						break;
-					}
-				} else if (pScript.level > 10 && pScript.level <= 20){
-					switch (i.stage)
-					{
-					case 2:
-						twoHButton.transform.GetChild(0).gameObject.GetComponent<Text>().text = i.itemName;
-						break;
-					}
+			} else if (i.type == InventoryObject.itemTypes.TWOH) {
+				if (i.stage == weaponStage){
+					wTwo = i;
 				}
-			}
-
-			if (i.type == InventoryObject.itemTypes.DW){
-				if (pScript.level > 0 && pScript.level <= 10){
-					switch (i.stage)
-					{
-					case 1:
-						dwButton.transform.GetChild(0).gameObject.GetComponent<Text>().text = i.itemName;
-						break;
-					}
-				} else if (pScript.level > 10 && pScript.level <= 20){
-					switch (i.stage)
-					{
-					case 2:
-						dwButton.transform.GetChild(0).gameObject.GetComponent<Text>().text = i.itemName;
-						break;
-					}
+			} else if (i.type == InventoryObject.itemTypes.DW) {
+				if (i.stage == weaponStage){
+					wThree = i;
 				}
 			}
 
 			if (i.type == InventoryObject.itemTypes.AR){
 
 				if (i.stage == armourStage - 1){
-					tOneAB.transform.GetChild(0).gameObject.GetComponent<Text>().text = i.itemName;
+					aOne = i;
 				}
 
 				if (i.stage == armourStage){
-					tTwoAB.transform.GetChild(0).gameObject.GetComponent<Text>().text = i.itemName;
+					aTwo = i;
 				}
 
 				if (i.stage == armourStage + 1){
-					tThreeAB.transform.GetChild(0).gameObject.GetComponent<Text>().text = i.itemName;
+					aThree = i;
 				}
+
+
 			}
+		}
+
+		if (wOne != null){
+			sabButton.transform.GetChild(0).gameObject.GetComponent<Text>().text = wOne.itemName;
+		} else {
+			print ("SAB not available");
+			sabButton.transform.GetChild(0).gameObject.GetComponent<Text>().text = "Unavailable";
+		}
+
+		if (wTwo != null){
+			twoHButton.transform.GetChild (0).gameObject.GetComponent<Text> ().text = wTwo.itemName;
+		} else {
+			print ("2H not available");
+			twoHButton.transform.GetChild (0).gameObject.GetComponent<Text> ().text = "Unavailable";
+		}
+
+		if (wThree != null){
+			dwButton.transform.GetChild (0).gameObject.GetComponent<Text> ().text = wThree.itemName;
+		} else {
+			print ("DW not available");
+			dwButton.transform.GetChild (0).gameObject.GetComponent<Text> ().text = "Unavailable";
+		}
+
+		if (aOne != null){
+			if (eArmour == aOne){
+				tOneAB.transform.GetChild(0).gameObject.GetComponent<Text>().text = aOne.itemName + " (Equipped)";
+			} else {
+				tOneAB.transform.GetChild(0).gameObject.GetComponent<Text>().text = aOne.itemName;
+			}
+
+		} else {
+			print ("aOne not available");
+			tOneAB.transform.GetChild (0).gameObject.GetComponent<Text> ().text = "Unavailable";
+		}
+
+		if (aTwo != null){
+			tTwoAB.transform.GetChild(0).gameObject.GetComponent<Text>().text = aTwo.itemName;
+		} else {
+			tTwoAB.transform.GetChild(0).gameObject.GetComponent<Text>().text = "Unavailable";
+			print ("aTwo not available");
+		}
+
+		if (aThree != null){
+			tThreeAB.transform.GetChild(0).gameObject.GetComponent<Text>().text = aThree.itemName;
+		} else {
+			tThreeAB.transform.GetChild(0).gameObject.GetComponent<Text>().text = "Unavailable";
+			print ("aThree not available");
 		}
 	}
 	#endregion
@@ -956,7 +983,7 @@ public class Control_Script : MonoBehaviour {
 
 			activeScheme = controlSchemes.TSCHEME;
 
-
+			StartTrain ();
 			break;
 		case minigames.EXPLORE:
 			activeGame = minigames.EXPLORE;
@@ -968,6 +995,8 @@ public class Control_Script : MonoBehaviour {
 			tMiniObject.SetActive (false);
 
 			activeScheme = controlSchemes.ESCHEME;
+
+			StartExplore ();
 			break;
 		case minigames.NONE:
 			minigameActive = false;
@@ -1002,11 +1031,13 @@ public class Control_Script : MonoBehaviour {
 		if (!match){
 			AddGold ((int)minigameGoldEarned);
 			pScript.AddExp ((int)minigameXPEarned);
-			EndMinigame ();
+			dayGoldEarnt += (int)minigameGoldEarned;
+			dayXPEarnt += (int)minigameXPEarned;
+			EndMinigame (actions.WORK);
 			wSphere.GetComponent<WSphereScript> ().gravForce = wSphere.GetComponent<WSphereScript>().initGravForce;
 			wInitTimerMax = wInitTimerMaxStart;
 		} else {
-			wSphere.GetComponent<WSphereScript> ().gravForce += 2;
+			wSphere.GetComponent<WSphereScript> ().gravForce += 4;
 			minigameGoldEarned += jobLevel;
 			minigameXPEarned += pScript.expAdd;
 			AddJobEXP (jobEXPAdd);
@@ -1052,23 +1083,6 @@ public class Control_Script : MonoBehaviour {
 		bottomMenuCanvasObject.SetActive (false);
 		ArrowScript a = trainArrow.GetComponent<ArrowScript> ();
 
-		int i = Mathf.RoundToInt(Random.Range (0.0f, 3.0f));
-		switch (i)
-		{
-		case 0:
-			a.SetDirection ("up");
-			break;
-		case 1:
-			a.SetDirection ("down");
-			break;
-		case 2:
-			a.SetDirection ("left");
-			break;
-		case 3:
-			a.SetDirection ("right");
-			break;
-		}
-
 		minigameGoldEarned = 0;
 		minigameXPEarned = 0;
 		trainTimerMax = trainTimerMaxStart;
@@ -1078,7 +1092,6 @@ public class Control_Script : MonoBehaviour {
 
 	private void TrainInput(){
 
-		ArrowScript a = trainArrow.GetComponent<ArrowScript> ();
 		float b = trainTimerMax * 0.05f;
 		if (Input.GetKeyDown(KeyCode.W)){
 			CheckTrainInput ("up");
@@ -1168,7 +1181,9 @@ public class Control_Script : MonoBehaviour {
 		trainTimerMax = trainTimerMaxStart;
 		AddGold ((int)minigameGoldEarned);
 		pScript.AddExp ((int)minigameXPEarned);
-		EndMinigame ();
+		dayGoldEarnt += (int)minigameGoldEarned;
+		dayXPEarnt += (int)minigameXPEarned;
+		EndMinigame (actions.TRAIN);
 	}
 
 	private void ResetTrainTimer(){
@@ -1178,17 +1193,186 @@ public class Control_Script : MonoBehaviour {
 	}
 
 	#endregion
-	public void EndMinigame(){
+
+	#region explore
+
+	private void StartExplore() {
+		bottomMenuCanvasObject.SetActive (false);
+
+		minigameGoldEarned = 0;
+		minigameXPEarned = 0;
+
+		areaControl.SetActive (true);
+		foreach (GameObject g in areaObjects){
+			g.SetActive (false);
+		}
+
+		epScript.canMove = true;
+		epScript.gameObject.transform.position += Vector3.up * 500;
+
+	}
+
+	public void EndExplore(){
+		AddGold ((int)minigameGoldEarned);
+		pScript.AddExp ((int)minigameXPEarned);
+		dayXPEarnt += (int)minigameXPEarned;
+		dayGoldEarnt = (int)minigameGoldEarned;
+
+
+		EndMinigame (actions.EXPLORE);
+	}
+
+	private void ExploreUpdate(){
+		
+	}
+
+	private void ExploreInput(){
+		if (Input.GetKeyDown(KeyCode.W)){
+			epScript.MoveInDirection ("up");
+		}
+
+		if (Input.GetKeyDown(KeyCode.S)){
+			epScript.MoveInDirection ("down");
+		}
+
+		if (Input.GetKeyDown(KeyCode.A)){
+			epScript.MoveInDirection ("left");
+		}
+
+		if (Input.GetKeyDown(KeyCode.D)){
+			epScript.MoveInDirection ("right");
+		}
+	}
+
+	public void TileReward(GameObject t){
+		minigameGoldEarned += t.GetComponent<TileScript> ().enemyCP;
+		minigameXPEarned += t.GetComponent<TileScript> ().enemyCP * 2;
+	}
+
+
+	#endregion
+	public void EndMinigame(actions a){
+		float r = Random.Range (0.0f, 100.0f);
+		if (r < 25){
+			adButton.gameObject.SetActive (true);
+		} else {
+			adButton.gameObject.SetActive (false);
+		}
+
 		mainCam.transform.position = mainCamStartPos;
 		bottomMenuCanvasObject.SetActive (true);
 		activeScheme = controlSchemes.NONE;
 		StartMinigame(minigames.NONE);
 		SetActiveWindow(windows.FEEDBACK);
-		UpdateFeedbackWindow (actions.WORK, (int)minigameXPEarned, (int)minigameGoldEarned);
+		UpdateFeedbackWindow (a, (int)minigameXPEarned, (int)minigameGoldEarned);
 		SaveGameVariables ();
 
 	}
 
 	#endregion 
+
+	#region advertisements
+	public void StartAdvertisement(){
+		print ("advertisement begun");
+
+		adPanel.SetActive (true);
+		adButton.gameObject.SetActive (false);
+		AddGold ((int)(minigameGoldEarned * 0.5f));
+		dayGoldEarnt += (int)(minigameGoldEarned * 0.5f);
+		minigameGoldEarned *= 1.5f;
+		Invoke ("EndAdvertisement", 5);
+	}
+
+	public void EndAdvertisement(){
+		adPanel.SetActive (false);
+		UpdateFeedbackWindow (actions.ADVERTISEMENT, (int)minigameXPEarned, (int)minigameGoldEarned);
+	}
+
+	#endregion
+
+	#region microtransactions
+
+	public float GetGoldTierRation(int tier){
+		int i = 0;
+		switch (tier)
+		{
+		case 1:
+			i = pScript.level * 10;
+
+			break;
+		case 2:
+			i = pScript.level * 25;
+			break;
+		case 3:
+			i = pScript.level * 75;
+			break;
+		case 4:
+			i = pScript.level * 300;
+			break;
+		default:
+			print ("Inactive tier input");
+			i = 0;
+			break;
+		}
+		return i;
+	}
+
+	public float GetGemTierRation(int tier){
+		return 0;
+	}
+
+	public void BuyGold(int tier){
+
+		switch (tier)
+			{
+			case 1:
+				if (gemObj.itemQuantity > 5){
+					AddGem (-5);
+					AddGold (pScript.level * 10);
+					UpdateUI ();
+					print ("added: " + pScript.level * 10 + " Gold");
+				}
+				break;
+			case 2:
+				if (gemObj.itemQuantity > 10){
+					AddGem (-10);
+					AddGold (pScript.level * 25);
+					UpdateUI ();
+					print ("added: " + pScript.level * 25 + " Gold");
+				}
+				break;
+			case 3:
+				if (gemObj.itemQuantity > 25){
+					AddGem (-25);
+					AddGold (pScript.level * 75);
+					UpdateUI ();
+					print ("added: " + pScript.level * 75 + " Gold");
+				}
+				break;
+			case 4:
+				if (gemObj.itemQuantity > 75){
+					AddGem (-75);
+					AddGold (pScript.level * 300);
+					UpdateUI ();
+					print ("added: " + pScript.level * 300 + " Gold");
+				}
+				break;
+			default:
+				print ("Inactive tier input");
+				break;
+			}
+
+	}
+
+	public void BuyGems(int tier){
+		Debug.Log ("Not available");
+	}
+
+
+
+
+
+
+	#endregion
 
 }

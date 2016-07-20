@@ -7,6 +7,8 @@ public class Bottom_Menu_Script : MonoBehaviour {
 	private GameObject controlObj;
 	private Control_Script cScript;
 
+	public GameObject advertisementPanel;
+
 	public Button characterButton, actionButton, weaponsButton, armourButton, menuButton;
 	public Text goldText;
 	// Use this for initialization
@@ -21,6 +23,7 @@ public class Bottom_Menu_Script : MonoBehaviour {
 		armourButton.onClick.AddListener(() => cScript.SetActiveWindow(Control_Script.windows.ARMOUR));
 		menuButton.onClick.AddListener(() => cScript.SetActiveWindow(Control_Script.windows.MENU));
 
+		cScript.adPanel = advertisementPanel;
 	}
 	
 	// Update is called once per frame

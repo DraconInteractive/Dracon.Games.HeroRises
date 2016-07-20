@@ -4,7 +4,7 @@ using System.Collections;
 
 public class CWinScript : MonoBehaviour {
 
-	public Text nameText, levelText, expText, dayText, jobLevelText;
+	public Text nameText, levelText, expText, dayText, jobLevelText, weaponText, armourText;
 	public Button toMainButton;
 
 	// Use this for initialization

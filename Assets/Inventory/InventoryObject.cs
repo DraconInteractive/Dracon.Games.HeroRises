@@ -6,10 +6,12 @@ public class InventoryObject : ScriptableObject {
 	public string itemName;
 	public int itemQuantity;
 
-	public enum itemTypes {SAB, TWOH, DW, GOLD, AR};
+	public enum itemTypes {SAB, TWOH, DW, GOLD, GEM, AR};
 	public itemTypes type;
 
 	public int stage, cost, itemID;
+
+	public int dps, armour;
 
 	public void SaveItemDetails(){
 		PlayerPrefs.SetInt(itemName + "Quantity", itemQuantity);
