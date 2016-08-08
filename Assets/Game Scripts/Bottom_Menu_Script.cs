@@ -7,9 +7,11 @@ public class Bottom_Menu_Script : MonoBehaviour {
 	private GameObject controlObj;
 	private Control_Script cScript;
 
-	public GameObject advertisementPanel;
+	public GameObject advertisementPanel, tutorialPanelOne, tutorialPanelTwo, tutorialPanelThree;
 
-	public Button characterButton, actionButton, weaponsButton, armourButton, menuButton;
+	public Button characterButton, actionButton, menuButton;
+	public Button tutButton1, tutButton2, tutButton3;
+
 	public Text goldText;
 	// Use this for initialization
 	void Start () {
@@ -19,15 +21,28 @@ public class Bottom_Menu_Script : MonoBehaviour {
 		cScript.bottomMenu = this.gameObject.GetComponent<Bottom_Menu_Script>();
 		characterButton.onClick.AddListener(() => cScript.SetActiveWindow(Control_Script.windows.CHARACTER));
 		actionButton.onClick.AddListener(() => cScript.SetActiveWindow(Control_Script.windows.ACTION));
-		weaponsButton.onClick.AddListener(() => cScript.SetActiveWindow(Control_Script.windows.WEAPONS));
-		armourButton.onClick.AddListener(() => cScript.SetActiveWindow(Control_Script.windows.ARMOUR));
 		menuButton.onClick.AddListener(() => cScript.SetActiveWindow(Control_Script.windows.MENU));
 
+		tutButton1.onClick.AddListener (() => TutButtonOne ());
+		tutButton2.onClick.AddListener (() => TutButtonTwo ());
+		tutButton3.onClick.AddListener (() => TutButtonThree ());
+
 		cScript.adPanel = advertisementPanel;
+
 	}
 	
 	// Update is called once per frame
-	void Update () {
-	
+	public void TutButtonOne () {
+		tutorialPanelOne.SetActive (false);
+		tutorialPanelTwo.SetActive (true);
+	}
+
+	public void TutButtonTwo () {
+		tutorialPanelTwo.SetActive (false);
+		tutorialPanelThree.SetActive (true);
+	}
+
+	public void TutButtonThree () {
+		tutorialPanelThree.SetActive (false);
 	}
 }

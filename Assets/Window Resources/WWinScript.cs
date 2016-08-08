@@ -21,6 +21,8 @@ public class WWinScript : MonoBehaviour {
 		mtButton.onClick.AddListener(() => c.MTBUTTON());
 
 		toMainButton.onClick.AddListener (() => c.SetActiveWindow (Control_Script.windows.NONE));
+
+		gameObject.SetActive (false);
 	}
 		
 }

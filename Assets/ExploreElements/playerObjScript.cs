@@ -82,12 +82,21 @@ public class playerObjScript : MonoBehaviour {
 			print ("Enemy CP - " + ts.enemyCP + " | Player CP - " + cp + " | Difference: " + (ts.enemyCP - cp).ToString());
 			if (ts.enemyCP >= cp){
 				LoseCombat ();
+				c.TileStory ("Lose");
 			} else {
 				WinCombat ();
-
+				c.TileStory ("Win");
 			}
 		} else {
 			NoCombat ();
+			if (c != null){
+				c.TileStory ("None");
+			} else {
+				c = Control_Script.controlObj.GetComponent<Control_Script> ();
+				print ("Retrieved c");
+				c.TileStory ("None");
+			}
+
 		}
 
 	}

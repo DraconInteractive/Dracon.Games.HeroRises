@@ -13,6 +13,7 @@ public class AWinScript : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		cScript = Control_Script.controlObj.GetComponent<Control_Script>();
+
 		cScript.energySlider = energySlider;
 
 		energySlider.minValue = 0;

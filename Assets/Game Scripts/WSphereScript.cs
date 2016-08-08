@@ -19,7 +19,7 @@ public class WSphereScript : MonoBehaviour {
 		{
 		case 0:
 			myColor = "Y";
-			GetComponent<MeshRenderer> ().material.color = Color.yellow;
+			GetComponent<MeshRenderer> ().material.color = new Color (1.0f,0.5f,1.0f);
 			break;
 		case 1:
 			myColor = "G";
@@ -58,7 +58,7 @@ public class WSphereScript : MonoBehaviour {
 		{
 		case 0:
 			myColor = "Y";
-			GetComponent<MeshRenderer> ().material.color = Color.yellow;
+			GetComponent<MeshRenderer> ().material.color = new Color (1.0f,0.5f,1.0f);
 			break;
 		case 1:
 			myColor = "G";

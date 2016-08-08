@@ -1,0 +1,647 @@
+fileFormatVersion: 2
+guid: 5ef66ec41925cac469d1bb9990ed7b30
+TextureImporter:
+  fileIDToRecycleName: {}
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 7
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: -1
+  maxTextureSize: 4096
+  textureSettings:
+    filterMode: -1
+    aniso: 1
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 50
+  allowsAlphaSplitting: 0
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 100
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  buildTargetSettings:
+  - buildTarget: iPhone
+    maxTextureSize: 1024
+    textureFormat: -2
+    compressionQuality: 50
+    allowsAlphaSplitting: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Idle/0000
+      rect:
+        serializedVersion: 2
+        x: 2212
+        y: 594
+        width: 418
+        height: 458
+      alignment: 9
+      pivot: {x: 0.4162679, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Idle/0001
+      rect:
+        serializedVersion: 2
+        x: 1966
+        y: 128
+        width: 418
+        height: 458
+      alignment: 9
+      pivot: {x: 0.4162679, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Idle/0002
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 1052
+        width: 418
+        height: 458
+      alignment: 9
+      pivot: {x: 0.4162679, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Idle/0003
+      rect:
+        serializedVersion: 2
+        x: 1736
+        y: 2584
+        width: 418
+        height: 456
+      alignment: 9
+      pivot: {x: 0.4162679, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Idle/0004
+      rect:
+        serializedVersion: 2
+        x: 2138
+        y: 2130
+        width: 418
+        height: 454
+      alignment: 9
+      pivot: {x: 0.4162679, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Idle/0005
+      rect:
+        serializedVersion: 2
+        x: 1972
+        y: 3626
+        width: 418
+        height: 454
+      alignment: 9
+      pivot: {x: 0.4162679, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Idle/0006
+      rect:
+        serializedVersion: 2
+        x: 1828
+        y: 3170
+        width: 418
+        height: 454
+      alignment: 9
+      pivot: {x: 0.4162679, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Idle/0007
+      rect:
+        serializedVersion: 2
+        x: 1554
+        y: 3624
+        width: 418
+        height: 456
+      alignment: 9
+      pivot: {x: 0.4162679, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Run/0008
+      rect:
+        serializedVersion: 2
+        x: 1254
+        y: 1962
+        width: 458
+        height: 464
+      alignment: 9
+      pivot: {x: 0.5305677, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Run/0009
+      rect:
+        serializedVersion: 2
+        x: 1738
+        y: 586
+        width: 474
+        height: 456
+      alignment: 9
+      pivot: {x: 0.5337553, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Run/0010
+      rect:
+        serializedVersion: 2
+        x: 2806
+        y: 3646
+        width: 416
+        height: 434
+      alignment: 9
+      pivot: {x: 0.3990385, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Run/0011
+      rect:
+        serializedVersion: 2
+        x: 1254
+        y: 2426
+        width: 482
+        height: 464
+      alignment: 9
+      pivot: {x: 0.2510374, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Run/0012
+      rect:
+        serializedVersion: 2
+        x: 1464
+        y: 120
+        width: 502
+        height: 466
+      alignment: 9
+      pivot: {x: 0.3466136, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Run/0013
+      rect:
+        serializedVersion: 2
+        x: 1254
+        y: 586
+        width: 484
+        height: 428
+      alignment: 9
+      pivot: {x: 0.2541322, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Attack3/0014
+      rect:
+        serializedVersion: 2
+        x: 440
+        y: 34
+        width: 646
+        height: 546
+      alignment: 9
+      pivot: {x: 0.2074303, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Attack3/0015
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 3160
+        width: 664
+        height: 920
+      alignment: 9
+      pivot: {x: 0.2289157, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Attack3/0016
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 2414
+        width: 500
+        height: 746
+      alignment: 9
+      pivot: {x: 0.548, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Attack3/0017
+      rect:
+        serializedVersion: 2
+        x: 516
+        y: 2544
+        width: 448
+        height: 616
+      alignment: 9
+      pivot: {x: 0.6495536, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Attack3/0018
+      rect:
+        serializedVersion: 2
+        x: 376
+        y: 1722
+        width: 356
+        height: 692
+      alignment: 9
+      pivot: {x: 0.508427, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Attack3/0019
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 1002
+        width: 404
+        height: 702
+      alignment: 9
+      pivot: {x: 0.4925742, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Attack3/0020
+      rect:
+        serializedVersion: 2
+        x: 1410
+        y: 3040
+        width: 418
+        height: 456
+      alignment: 9
+      pivot: {x: 0.4162679, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Attack2/0021
+      rect:
+        serializedVersion: 2
+        x: 420
+        y: 1128
+        width: 678
+        height: 594
+      alignment: 9
+      pivot: {x: 0.3893805, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Attack2/0022
+      rect:
+        serializedVersion: 2
+        x: 732
+        y: 1954
+        width: 522
+        height: 590
+      alignment: 9
+      pivot: {x: 0.5191571, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Attack2/0023
+      rect:
+        serializedVersion: 2
+        x: 828
+        y: 582
+        width: 426
+        height: 546
+      alignment: 9
+      pivot: {x: 0.6338028, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Attack2/0024
+      rect:
+        serializedVersion: 2
+        x: 1254
+        y: 1014
+        width: 376
+        height: 470
+      alignment: 9
+      pivot: {x: 0.337766, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Attack2/0025
+      rect:
+        serializedVersion: 2
+        x: 1712
+        y: 1968
+        width: 426
+        height: 458
+      alignment: 9
+      pivot: {x: 0.3615023, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Attack1/0026
+      rect:
+        serializedVersion: 2
+        x: 1130
+        y: 3496
+        width: 424
+        height: 584
+      alignment: 9
+      pivot: {x: 0.4646226, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Attack1/0027
+      rect:
+        serializedVersion: 2
+        x: 964
+        y: 2890
+        width: 446
+        height: 588
+      alignment: 9
+      pivot: {x: 0.470852, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Attack1/0028
+      rect:
+        serializedVersion: 2
+        x: 680
+        y: 3478
+        width: 450
+        height: 602
+      alignment: 9
+      pivot: {x: 0.4844444, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Attack1/0029
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 406
+        width: 424
+        height: 596
+      alignment: 9
+      pivot: {x: 0.4481132, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Hurt/0030
+      rect:
+        serializedVersion: 2
+        x: 2538
+        y: 3194
+        width: 418
+        height: 442
+      alignment: 9
+      pivot: {x: 0.4114833, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Hurt/0031
+      rect:
+        serializedVersion: 2
+        x: 1098
+        y: 1484
+        width: 378
+        height: 470
+      alignment: 9
+      pivot: {x: 0.4338624, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Hurt/0032
+      rect:
+        serializedVersion: 2
+        x: 1476
+        y: 1500
+        width: 382
+        height: 462
+      alignment: 9
+      pivot: {x: 0.4293194, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Hurt/0033
+      rect:
+        serializedVersion: 2
+        x: 1086
+        y: 104
+        width: 378
+        height: 478
+      alignment: 9
+      pivot: {x: 0.4312169, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Hurt/0034
+      rect:
+        serializedVersion: 2
+        x: 440
+        y: 580
+        width: 388
+        height: 548
+      alignment: 9
+      pivot: {x: 0.4613402, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Hurt/0035
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 1704
+        width: 360
+        height: 710
+      alignment: 9
+      pivot: {x: 0.4972222, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Hurt/0036
+      rect:
+        serializedVersion: 2
+        x: 2390
+        y: 3636
+        width: 416
+        height: 444
+      alignment: 9
+      pivot: {x: 0.4423077, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Hurt/0037
+      rect:
+        serializedVersion: 2
+        x: 1858
+        y: 1510
+        width: 418
+        height: 458
+      alignment: 9
+      pivot: {x: 0.4162679, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Jump/0038
+      rect:
+        serializedVersion: 2
+        x: 2534
+        y: 2736
+        width: 700
+        height: 442
+      alignment: 9
+      pivot: {x: 0.2685714, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Jump/0039
+      rect:
+        serializedVersion: 2
+        x: 2956
+        y: 3220
+        width: 684
+        height: 426
+      alignment: 9
+      pivot: {x: 0.3464912, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Jump/0040
+      rect:
+        serializedVersion: 2
+        x: 3222
+        y: 3674
+        width: 344
+        height: 406
+      alignment: 9
+      pivot: {x: 0.5930232, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Jump/0041
+      rect:
+        serializedVersion: 2
+        x: 2246
+        y: 3178
+        width: 292
+        height: 448
+      alignment: 9
+      pivot: {x: 0.4623288, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Jump/0042
+      rect:
+        serializedVersion: 2
+        x: 2154
+        y: 2718
+        width: 380
+        height: 452
+      alignment: 9
+      pivot: {x: 0.3447368, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Jump/0043
+      rect:
+        serializedVersion: 2
+        x: 2384
+        y: 138
+        width: 418
+        height: 456
+      alignment: 9
+      pivot: {x: 0.3995215, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: Jump/0044
+      rect:
+        serializedVersion: 2
+        x: 1630
+        y: 1042
+        width: 418
+        height: 458
+      alignment: 9
+      pivot: {x: 0.4162679, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    outline: []
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

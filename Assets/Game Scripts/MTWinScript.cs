@@ -23,6 +23,8 @@ public class MTWinScript : MonoBehaviour {
 		gemTwo.onClick.AddListener (() => c.BuyGems (2));
 		gemThree.onClick.AddListener (() => c.BuyGems (3));
 		gemFour.onClick.AddListener (() => c.BuyGems (4));
+
+		gameObject.SetActive (false);
 	}
 
 	private void GoToMain(){

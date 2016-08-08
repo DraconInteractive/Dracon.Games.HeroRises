@@ -1,12 +1,14 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Analytics;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Main_Menu_Script : MonoBehaviour {
 	private GameObject controlObj;
 	private Control_Script cScript;
 
-	public GameObject startWindow;
+	public GameObject startWindow, stage1, mainCanvas;
 
 	public Button newGameButton, continueButton, quitButton, beginButton;
 	public InputField playerNameInput;
@@ -21,30 +23,43 @@ public class Main_Menu_Script : MonoBehaviour {
 		quitButton.onClick.AddListener(() => cScript.QuitGame());
 		beginButton.onClick.AddListener(() => BeginGame());
 
+		mainCanvas.GetComponent<Canvas> ().enabled = false;
 		startWindow.SetActive(false);
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
 	}
 
 	public void NewGame(){
 		startWindow.SetActive(true);
+		stage1.SetActive (false);
 	}
 
 	private void ContinueGame(){
+		
 		cScript.LoadGameVariables();
 		cScript.gameActive = true;
+		mainCanvas.GetComponent<Canvas> ().enabled = true;
+		GameObject.FindGameObjectWithTag ("BlurCam").SetActive (false);
 		this.gameObject.SetActive(false);
 	}
 
 	private void BeginGame(){
+
+		Analytics.CustomEvent("BeginNewGame", new Dictionary<string, object>
+			{
+				{ "playerName", playerNameInput.text }
+			});
+		
 		Player_Script.playerObj.GetComponent<Player_Script>().playerName = playerNameInput.text;
 		cScript.LoadStartingGameVariables();
 		cScript.SaveGameVariables();
 		cScript.gameActive = true;
 		startWindow.SetActive(false);
-		this.gameObject.SetActive(false);
+		mainCanvas.GetComponent<Canvas> ().enabled = true;
+		GameObject.FindGameObjectWithTag ("BlurCam").SetActive (false);
+		this.gameObject.SetActive (false);
+	}
+
+	void OnEnable () {
+		mainCanvas.GetComponent<Canvas> ().enabled = false;
+		stage1.SetActive (true);
 	}
 }

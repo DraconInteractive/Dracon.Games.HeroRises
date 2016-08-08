@@ -23,6 +23,8 @@ public class ARWinScript : MonoBehaviour {
 		tThreeA.onClick.AddListener(() => c.TThreeAButton());
 		mtButton.onClick.AddListener(() => c.MTBUTTON());
 		toMainButton.onClick.AddListener (() => c.SetActiveWindow (Control_Script.windows.NONE));
+
+		gameObject.SetActive (false);
 	}
 	
 

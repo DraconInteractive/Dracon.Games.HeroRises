@@ -17,18 +17,20 @@ public class Control_Script : MonoBehaviour {
 	public bool gameActive;
 	public int day;
 	public float dayTime;
-	public int dayGoldEarnt;
-	public int dayXPEarnt;
+	public int dayGoldEarned;
+	public int dayXPEarned;
 
 	public GameObject adPanel;
 	public Button adButton;
 
+	public bool uiActive;
 
 	//Windows
 	public Bottom_Menu_Script bottomMenu;
 	public GameObject characterWindow, actionWindow, menuWindow, weaponsWindow, armourWindow, feedbackWindow, mtWindow;
+	public GameObject dojoWindow, blacksmithWindow;
 
-	public enum windows {CHARACTER, ACTION, MENU, WEAPONS, ARMOUR, FEEDBACK, MICROTRANSACTIONS, NONE};
+	public enum windows {CHARACTER, ACTION, MENU, WEAPONS, ARMOUR, FEEDBACK, MICROTRANSACTIONS, BLACKSMITH, DOJO, NONE};
 	public windows activeWindow;
 
 	public Button sabButton, twoHButton, dwButton;
@@ -55,8 +57,6 @@ public class Control_Script : MonoBehaviour {
 	public InventoryObject goldObj;
 	public InventoryObject gemObj;
 
-
-
 	//Quest
 
 	public QuestObject[] allQuests;
@@ -82,6 +82,7 @@ public class Control_Script : MonoBehaviour {
 	//Work
 	public GameObject wSphere;
 	public GameObject initBlocker, leftBlocker, rightBlocker;
+	public Text wHelpText;
 	private float wInitTimer;
 	public float wInitTimerMaxStart, wInitTimerMax;
 	private float ballFalling;
@@ -95,6 +96,14 @@ public class Control_Script : MonoBehaviour {
 	public playerObjScript epScript;
 	public GameObject areaControl;
 	public GameObject[] areaObjects;
+	public Text areaOneInfoText;
+	public Text areaOneNarrativeText;
+	public int activeArea;
+
+	public string[] enemies;
+	public string[] winNarrative;
+	public string[] loseNarrative;
+	public string[] neutralNarrative;
 	//Debug
 	public int invIDMax;
 
@@ -130,6 +139,13 @@ public class Control_Script : MonoBehaviour {
 				}
 			}
 		}
+
+		Analytics.CustomEvent("GameStarted", new Dictionary<string, object>
+			{
+				{ "Time", System.DateTime.Now },
+			});
+
+		Analytics.SetUserGender (Gender.Male);
 	}
 	
 	// Update is called once per frame
@@ -200,20 +216,27 @@ public class Control_Script : MonoBehaviour {
 			activeWindow = windows.NONE;
 		} else {
 			activeWindow = window;
+			Analytics.CustomEvent("Opening Window", new Dictionary<string, object>
+				{
+					{ "Window", window.ToString() }
+				});
 		}
-			
+
 		switch (activeWindow)
 		{
 		case windows.ACTION:
 
-			actionWindow.SetActive(true);
+			actionWindow.SetActive (true);
 
-			characterWindow.SetActive(false);
-			menuWindow.SetActive(false);
-			weaponsWindow.SetActive(false);
-			armourWindow.SetActive(false);
-			feedbackWindow.SetActive(false);
-			mtWindow.SetActive(false);
+			characterWindow.SetActive (false);
+			menuWindow.SetActive (false);
+			weaponsWindow.SetActive (false);
+			armourWindow.SetActive (false);
+			feedbackWindow.SetActive (false);
+			mtWindow.SetActive (false);
+			blacksmithWindow.SetActive (false);
+			dojoWindow.SetActive (false);
+
 			break;
 		case windows.CHARACTER:
 			
@@ -225,6 +248,8 @@ public class Control_Script : MonoBehaviour {
 			armourWindow.SetActive(false);
 			feedbackWindow.SetActive(false);
 			mtWindow.SetActive(false);
+			blacksmithWindow.SetActive (false);
+			dojoWindow.SetActive (false);
 			break;
 		case windows.MENU:
 			
@@ -236,6 +261,8 @@ public class Control_Script : MonoBehaviour {
 			armourWindow.SetActive(false);
 			feedbackWindow.SetActive(false);
 			mtWindow.SetActive(false);
+			blacksmithWindow.SetActive (false);
+			dojoWindow.SetActive (false);
 			break;
 		case windows.WEAPONS:
 			weaponsWindow.SetActive(true);
@@ -246,6 +273,8 @@ public class Control_Script : MonoBehaviour {
 			armourWindow.SetActive(false);
 			feedbackWindow.SetActive(false);
 			mtWindow.SetActive(false);
+			blacksmithWindow.SetActive (false);
+			dojoWindow.SetActive (false);
 			break;
 		case windows.ARMOUR:
 			armourWindow.SetActive(true);
@@ -256,6 +285,8 @@ public class Control_Script : MonoBehaviour {
 			weaponsWindow.SetActive(false);
 			feedbackWindow.SetActive(false);
 			mtWindow.SetActive(false);
+			blacksmithWindow.SetActive (false);
+			dojoWindow.SetActive (false);
 			break;
 
 		case windows.FEEDBACK:
@@ -267,6 +298,8 @@ public class Control_Script : MonoBehaviour {
 			weaponsWindow.SetActive(false);
 			armourWindow.SetActive(false);
 			mtWindow.SetActive(false);
+			blacksmithWindow.SetActive (false);
+			dojoWindow.SetActive (false);
 			break;
 		case windows.MICROTRANSACTIONS:
 			mtWindow.SetActive(true);
@@ -277,6 +310,34 @@ public class Control_Script : MonoBehaviour {
 			weaponsWindow.SetActive(false);
 			armourWindow.SetActive(false);
 			feedbackWindow.SetActive(false);
+			blacksmithWindow.SetActive (false);
+			dojoWindow.SetActive (false);
+			break;
+		case windows.BLACKSMITH:
+
+			blacksmithWindow.SetActive (true);
+
+			mtWindow.SetActive (false);
+			actionWindow.SetActive (false);
+			characterWindow.SetActive (false);
+			menuWindow.SetActive (false);
+			weaponsWindow.SetActive (false);
+			armourWindow.SetActive (false);
+			feedbackWindow.SetActive (false);
+			dojoWindow.SetActive (false);
+			break;
+		case windows.DOJO:
+
+			dojoWindow.SetActive (true);
+
+			blacksmithWindow.SetActive (false);
+			mtWindow.SetActive (false);
+			actionWindow.SetActive (false);
+			characterWindow.SetActive (false);
+			menuWindow.SetActive (false);
+			weaponsWindow.SetActive (false);
+			armourWindow.SetActive (false);
+			feedbackWindow.SetActive (false);
 			break;
 		case windows.NONE:
 			mtWindow.SetActive(false);
@@ -286,7 +347,15 @@ public class Control_Script : MonoBehaviour {
 			weaponsWindow.SetActive(false);
 			armourWindow.SetActive(false);
 			feedbackWindow.SetActive(false);
+			blacksmithWindow.SetActive (false);
+			dojoWindow.SetActive (false);
 			break;
+		}
+
+		if (activeWindow == windows.NONE){
+			uiActive = false;
+		} else {
+			uiActive = true;
 		}
 	}
 
@@ -295,6 +364,7 @@ public class Control_Script : MonoBehaviour {
 	}
 
 	public void UpdateUI(){
+		pScript.CheckLevelStatus ();
 		CWinScript c = characterWindow.GetComponent<CWinScript>();
 		c.nameText.text = "Name: " + pScript.playerName;
 		c.levelText.text = "Level: " + pScript.level.ToString();
@@ -303,6 +373,23 @@ public class Control_Script : MonoBehaviour {
 		c.jobLevelText.text = "Job Level: " + jobLevel.ToString();
 		c.weaponText.text = "Weapon: " + eWeapon.itemName;
 		c.armourText.text = "Armour: " + eArmour.itemName;
+
+		switch (eWeapon.type)
+		{
+		case InventoryObject.itemTypes.SAB:
+			c.weaponImage.sprite = c.weaponSprites [0];
+			break;
+		case InventoryObject.itemTypes.TWOH:
+			c.weaponImage.sprite = c.weaponSprites [1];
+			break;
+		case InventoryObject.itemTypes.DW:
+			c.weaponImage.sprite = c.weaponSprites [2];
+			break;
+		}
+
+//		c.weaponImage.SetNativeSize ();
+
+
 		bottomMenu.goldText.text = "Gold: " + goldObj.itemQuantity.ToString() + "   |   Gems: " + gemObj.itemQuantity.ToString();
 
 		energySlider.value = dayTime;
@@ -316,7 +403,9 @@ public class Control_Script : MonoBehaviour {
 
 	public void ReturnToMainMenu(){
 		SaveGameVariables();
+		GameObject.FindGameObjectWithTag ("BlurCam").SetActive (true);
 		mainMenu.SetActive(true);
+
 	}
 
 	public void MainButton(){
@@ -389,8 +478,7 @@ public class Control_Script : MonoBehaviour {
 		}
 
 		UpdateUI();
-//		UploadStatisticsToAnalytics ();
-//		SaveToXML ();
+
 	}
 
 	public void LoadGameVariables(){
@@ -468,6 +556,11 @@ public class Control_Script : MonoBehaviour {
 	}
 
 	public void LoadStartingGameVariables(){
+		Analytics.CustomEvent("Starting New Game", new Dictionary<string, object>
+			{
+				{ "Time", System.DateTime.Now }
+			});
+		
 		SetActiveWindow(windows.NONE);
 
 		pScript.level = 1;
@@ -504,55 +597,11 @@ public class Control_Script : MonoBehaviour {
 			quest.ResetQuestStatus();
 		}
 
+		bottomMenu.GetComponent<Bottom_Menu_Script> ().tutorialPanelOne.SetActive (true);
+
 		UpdateUI();
 	}
-
-	private void UploadStatisticsToAnalytics(){
-		Player_Script p = playerObj.GetComponent<Player_Script> ();
-		Dictionary<string, object> playerStats = new Dictionary<string, object> ();
-		playerStats.Add ("PlayerName", p.playerName);
-		playerStats.Add ("PlayerLevel", p.level);
-		playerStats.Add ("PlayerCurrentEXP", p.currentExp);
-		playerStats.Add ("PlayerMaxEXP", p.maxExp);
-		playerStats.Add ("Job Level", jobLevel);
-		playerStats.Add ("PlayerWeapon", eWeapon.ToString ());
-		playerStats.Add ("PlayerArmour", eArmour.ToString ());
-		Analytics.SetUserId (SystemInfo.deviceModel);
-
-		Analytics.CustomEvent ("StandardUpload", playerStats);
-	}
-
-	private void SaveToXML(){
-		string fileName = "";
-		fileName = "Save01.xml";
-
-		XmlDocument xml = new XmlDocument ();
-
-		if (File.Exists(Application.persistentDataPath + "/" + fileName)) {
-			xml.Load (Application.persistentDataPath + "/" + fileName);
-		} else {
-			XmlElement root = xml.CreateElement ("GameSessions");
-			XmlElement id = xml.CreateElement ("ID");
-			id.InnerXml = SystemInfo.deviceUniqueIdentifier;
-			root.AppendChild (id);
-			xml.AppendChild (root);
-		}
-
-		XmlElement session = xml.CreateElement ("Session");
-
-		XmlElement pName = xml.CreateElement ("PlayerName");
-		pName.InnerText = playerObj.GetComponent<Player_Script> ().playerName;
-		session.AppendChild (pName);
-
-		XmlElement timeStamp = xml.CreateElement ("TimeStamp");
-		timeStamp.InnerText = "Hour: " + System.DateTime.Now.Hour.ToString() + "Minute: " + System.DateTime.Now.Minute.ToString() + "Second: " + System.DateTime.Now.Second.ToString();
-		session.AppendChild (timeStamp);
-
-		xml.DocumentElement.AppendChild (session);
-
-		xml.Save (Application.persistentDataPath + "/" + fileName);
-
-	}
+		
 	#endregion
 
 	#region action functions
@@ -565,20 +614,52 @@ public class Control_Script : MonoBehaviour {
 		{
 		case actions.EXPLORE:
 			StartMinigame (minigames.EXPLORE);
+			Analytics.CustomEvent("StartExplore", new Dictionary<string, object>
+				{
+					{ "startGold", goldObj.itemQuantity },
+					{ "startXP", pScript.currentExp },
+					{ "activeWeapon", eWeapon.ToString()},
+					{ "activeArmour", eArmour.ToString()},
+					{ "playerCP", epScript.cp},
+					{ "playerLevel", pScript.level}
+				});
 			break;
 		case actions.REST:
+			Analytics.CustomEvent("EndDay", new Dictionary<string, object>
+				{
+					{ "dayGoldEarned", dayGoldEarned },
+					{ "dayXPEarned", dayXPEarned },
+					{ "currentGold", goldObj.itemQuantity},
+					{ "currentXP", pScript.currentExp},
+					{ "currentLevel", pScript.level}
+				});
 			FinishDay();
+
 			break;
 		case actions.TRAIN:
+			Analytics.CustomEvent("StartTrain", new Dictionary<string, object>
+				{
+					{ "startXP", pScript.currentExp },
+					{ "currentLevel", pScript.level }
+				});
 			StartMinigame (minigames.TRAIN);
 			break;
 		case actions.WORK:
+			Analytics.CustomEvent("StartWork", new Dictionary<string, object>
+				{
+					{ "startGold", goldObj.itemQuantity },
+					{ "startXP", pScript.currentExp },
+					{ "activeWeapon", eWeapon.ToString()},
+					{ "activeArmour", eArmour.ToString()},
+					{ "playerCP", epScript.cp},
+					{ "playerLevel", pScript.level}
+				});
 			StartMinigame (minigames.WORK);
 			break;
 		}
 
-//		dayGoldEarnt += goldAdd;
-//		dayXPEarnt += expAdd;
+//		dayGoldEarned += goldAdd;
+//		dayXPEarned += expAdd;
 
 
 		if (dayTime < 1){
@@ -600,20 +681,20 @@ public class Control_Script : MonoBehaviour {
 			feedbackTitleText.text = a.ToString();
 			goldAddText.text = "Day: " + (day - 1).ToString() + " Finished";
 			expAddText.text = "";
-			expCurrentText.text = "Gold Earnt Today: " + dayGoldEarnt;
-			levelCurrentText.text = "Experience Earnt Today: " + dayXPEarnt;
-			dayGoldEarnt = 0;
-			dayXPEarnt = 0;
+			expCurrentText.text = "Gold Earned Today: " + dayGoldEarned;
+			levelCurrentText.text = "Experience Earned Today: " + dayXPEarned;
+			dayGoldEarned = 0;
+			dayXPEarned = 0;
 		} else if (a == actions.ADVERTISEMENT){
 			feedbackTitleText.text = a.ToString();
-			expAddText.text = "Experience Earnt: " + expAdd.ToString();
-			goldAddText.text = "Gold Earnt: " + goldAdd.ToString() + " (+150%)";
+			expAddText.text = "Experience Earned: " + expAdd.ToString();
+			goldAddText.text = "Gold Earned: " + goldAdd.ToString() + " (+150%)";
 			expCurrentText.text = "Current Experience: " + pScript.currentExp.ToString() + " / " + pScript.maxExp.ToString();
 			levelCurrentText.text = "Current Level: " + pScript.level.ToString();
 		} else {
 			feedbackTitleText.text = a.ToString();
-			expAddText.text = "Experience Earnt: " + expAdd.ToString();
-			goldAddText.text = "Gold Earnt: " + goldAdd.ToString();
+			expAddText.text = "Experience Earned: " + expAdd.ToString();
+			goldAddText.text = "Gold Earned: " + goldAdd.ToString();
 			expCurrentText.text = "Current Experience: " + pScript.currentExp.ToString() + " / " + pScript.maxExp.ToString();
 			levelCurrentText.text = "Current Level: " + pScript.level.ToString();
 		}
@@ -627,7 +708,7 @@ public class Control_Script : MonoBehaviour {
 		UpdateUI();
 
 		SetActiveWindow (windows.FEEDBACK);
-		UpdateFeedbackWindow (actions.REST, dayGoldEarnt, dayXPEarnt);
+		UpdateFeedbackWindow (actions.REST, dayGoldEarned, dayXPEarned);
 
 	}
 
@@ -642,6 +723,13 @@ public class Control_Script : MonoBehaviour {
 				i.SaveItemDetails();
 			}
 		}
+
+		Analytics.CustomEvent("AddingItemToInventory", new Dictionary<string, object>
+			{
+				{ "ItemAdded", iName },
+				{ "playerLevel", pScript.level },
+				{ "playerGold", goldObj.itemQuantity}
+			});
 	}
 
 	public void AddGold(int amount){
@@ -866,49 +954,85 @@ public class Control_Script : MonoBehaviour {
 
 		if (wOne != null){
 			sabButton.transform.GetChild(0).gameObject.GetComponent<Text>().text = wOne.itemName;
+			if (wOne.cost < goldObj.itemQuantity){
+				sabButton.interactable = true;
+			} else {
+				sabButton.interactable = false;
+			}
 		} else {
 			print ("SAB not available");
 			sabButton.transform.GetChild(0).gameObject.GetComponent<Text>().text = "Unavailable";
+			sabButton.interactable = false;
 		}
 
 		if (wTwo != null){
 			twoHButton.transform.GetChild (0).gameObject.GetComponent<Text> ().text = wTwo.itemName;
+			if (wTwo.cost < goldObj.itemQuantity){
+				twoHButton.interactable = true;
+			} else {
+				twoHButton.interactable = false;
+			}
 		} else {
 			print ("2H not available");
 			twoHButton.transform.GetChild (0).gameObject.GetComponent<Text> ().text = "Unavailable";
+			twoHButton.interactable = false;
 		}
 
 		if (wThree != null){
 			dwButton.transform.GetChild (0).gameObject.GetComponent<Text> ().text = wThree.itemName;
+			if (wThree.cost < goldObj.itemQuantity){
+				dwButton.interactable = true;
+			} else {
+				dwButton.interactable = false;
+			}
 		} else {
 			print ("DW not available");
 			dwButton.transform.GetChild (0).gameObject.GetComponent<Text> ().text = "Unavailable";
+			dwButton.interactable = false;
 		}
 
 		if (aOne != null){
 			if (eArmour == aOne){
 				tOneAB.transform.GetChild(0).gameObject.GetComponent<Text>().text = aOne.itemName + " (Equipped)";
-			} else {
+				if (aOne.cost < goldObj.itemQuantity){
+					tOneAB.interactable = true;
+				} else {
+					tOneAB.interactable = false;
+				}
+			}/* else {
 				tOneAB.transform.GetChild(0).gameObject.GetComponent<Text>().text = aOne.itemName;
-			}
+			}*/
 
 		} else {
 			print ("aOne not available");
 			tOneAB.transform.GetChild (0).gameObject.GetComponent<Text> ().text = "Unavailable";
+			tOneAB.interactable = false;
 		}
 
 		if (aTwo != null){
 			tTwoAB.transform.GetChild(0).gameObject.GetComponent<Text>().text = aTwo.itemName;
+			if (aTwo.cost < goldObj.itemQuantity){
+				tTwoAB.interactable = true;
+			} else {
+				tTwoAB.interactable = false;
+			}
 		} else {
 			tTwoAB.transform.GetChild(0).gameObject.GetComponent<Text>().text = "Unavailable";
 			print ("aTwo not available");
+			tTwoAB.interactable = false;
 		}
 
 		if (aThree != null){
 			tThreeAB.transform.GetChild(0).gameObject.GetComponent<Text>().text = aThree.itemName;
+			if (aThree.cost < goldObj.itemQuantity) {
+				tThreeAB.interactable = true;
+			} else {
+				tThreeAB.interactable = false;
+			}
 		} else {
 			tThreeAB.transform.GetChild(0).gameObject.GetComponent<Text>().text = "Unavailable";
 			print ("aThree not available");
+			tThreeAB.interactable = false;
 		}
 	}
 	#endregion
@@ -1016,7 +1140,7 @@ public class Control_Script : MonoBehaviour {
 		leftBlocker.SetActive (false);
 		rightBlocker.SetActive (false);
 		bottomMenuCanvasObject.SetActive (false);
-
+		wHelpText.gameObject.SetActive (true);
 		wInitTimerMax = wInitTimerMaxStart;
 
 		minigameGoldEarned = 0;
@@ -1029,15 +1153,21 @@ public class Control_Script : MonoBehaviour {
 		rightBlocker.SetActive (false);
 
 		if (!match){
+			Analytics.CustomEvent("EndWork", new Dictionary<string, object>
+				{
+					{ "goldEarned", minigameGoldEarned },
+					{ "xpEarned", minigameXPEarned }
+				});
 			AddGold ((int)minigameGoldEarned);
 			pScript.AddExp ((int)minigameXPEarned);
-			dayGoldEarnt += (int)minigameGoldEarned;
-			dayXPEarnt += (int)minigameXPEarned;
+			dayGoldEarned += (int)minigameGoldEarned;
+			dayXPEarned += (int)minigameXPEarned;
 			EndMinigame (actions.WORK);
 			wSphere.GetComponent<WSphereScript> ().gravForce = wSphere.GetComponent<WSphereScript>().initGravForce;
 			wInitTimerMax = wInitTimerMaxStart;
 		} else {
-			wSphere.GetComponent<WSphereScript> ().gravForce += 4;
+			wHelpText.gameObject.SetActive (false);
+			wSphere.GetComponent<WSphereScript> ().gravForce += 10;
 			minigameGoldEarned += jobLevel;
 			minigameXPEarned += pScript.expAdd;
 			AddJobEXP (jobEXPAdd);
@@ -1127,12 +1257,7 @@ public class Control_Script : MonoBehaviour {
 		}
 
 		timeSlider.value = trainTimerMax - trainTimerCurrent;
-//		wInitTimer += Time.deltaTime;
-//		if (wInitTimer >= wInitTimerMax){
-//			wInitTimer = 0;
-//			wInitTimerMax -= 0.05f;
-//			initBlocker.SetActive (false);
-//		}
+
 	}
 
 	private void CheckTrainInput(string d){
@@ -1177,12 +1302,16 @@ public class Control_Script : MonoBehaviour {
 	}
 
 	private void TrainFail(){
+		Analytics.CustomEvent("EndTrain", new Dictionary<string, object>
+			{
+				{ "xpEarned", minigameXPEarned }
+			});
 		ResetTrainTimer ();
 		trainTimerMax = trainTimerMaxStart;
 		AddGold ((int)minigameGoldEarned);
 		pScript.AddExp ((int)minigameXPEarned);
-		dayGoldEarnt += (int)minigameGoldEarned;
-		dayXPEarnt += (int)minigameXPEarned;
+		dayGoldEarned += (int)minigameGoldEarned;
+		dayXPEarned += (int)minigameXPEarned;
 		EndMinigame (actions.TRAIN);
 	}
 
@@ -1210,20 +1339,62 @@ public class Control_Script : MonoBehaviour {
 		epScript.canMove = true;
 		epScript.gameObject.transform.position += Vector3.up * 500;
 
+		if (enemies.Length == 0){
+			enemies = new string[5];
+			enemies [0] = "Ogre";
+			enemies [1] = "Giant";
+			enemies [2] = "Troll";
+			enemies [3] = "Brett";
+			enemies [4] = "MemeLord";
+		}
+
+		if (winNarrative.Length == 0){
+			winNarrative = new string[5];
+			winNarrative [0] = pScript.playerName + " enters a sunlit grove. But there sits an " + enemies[(int)Random.Range(0.0f, 4.0f)] + "! With style, fashion and a pinch the epic, " + pScript.playerName + " fells the fearsome beast.";
+			winNarrative [1] = "Striding through dense forest, " + enemies[(int)Random.Range(0.0f, 4.0f)] + "s converge on " + pScript.playerName + ", shrouded in darkness. Suddenly, the sun shines through! With quick strikes the player defeats them, Praise The Sun!";
+			winNarrative [2] = "Tripping over their own feet, " + pScript.playerName + " stumbles upon a hidden trove of treasure!";
+			winNarrative [3] = "They said that any warrior to face the " + enemies[(int)Random.Range(0.0f, 4.0f)] + " would die in seconds. " + pScript.playerName + " proved them wrong!";
+			winNarrative [4] = "Arrows sliced through the air as " + pScript.playerName + " is ambushed by " + enemies[(int)Random.Range(0.0f, 4.0f)] + "s! But using his trusty " + eWeapon.itemName + ", " + pScript.playerName + " fought them back";
+		}
+
+		if (loseNarrative.Length == 0){
+			loseNarrative = new string[5];
+			loseNarrative [0] = "AHHHHH AN OGRE OH KNOW SHIIIIIIIIT HOLY GOD ITS SO BIG HOW THE HELL NO KEEP BACK NO NO NOOOOO AHHHH ... ... ... *gurgle*";
+			loseNarrative [1] = "With a single flick of its fingers, the " + enemies[(int)Random.Range(0.0f, 4.0f)] + " sent " + pScript.playerName + " flying through the air. Into a rock. A sharp rock. Ow";
+			loseNarrative [2] = "A Justin Bieber has challenged you to battle! Bieber uses 'Sing'!" + pScript.playerName + "dies excruciatingly!";
+			loseNarrative [3] = "With great flourish, and pazzaz, " + pScript.playerName + " dies to a group of " + enemies[(int)Random.Range(0.0f, 4.0f)] + "s.";
+			loseNarrative [4] = pScript.playerName + " realises suddenly that this is just a game and gives up";
+		}
+
+		if (neutralNarrative.Length == 0){
+			neutralNarrative = new string[5];
+			neutralNarrative [0] = pScript.playerName + " enters a clearing. Nothing happens";
+			neutralNarrative [1] = "The life of an adventurer is awesome. Just not right now";
+			neutralNarrative [2] = "Congratulations on your movement sire";
+			neutralNarrative [3] = "These tiles blend perfectly";
+			neutralNarrative [4] = "You made it! ... ... ... ... Now what?";
+		}
+
+
 	}
 
 	public void EndExplore(){
+		Analytics.CustomEvent("EndExplore", new Dictionary<string, object>
+			{
+				{ "goldEarned", minigameGoldEarned },
+				{ "xpEarned", minigameXPEarned }
+			});
 		AddGold ((int)minigameGoldEarned);
 		pScript.AddExp ((int)minigameXPEarned);
-		dayXPEarnt += (int)minigameXPEarned;
-		dayGoldEarnt = (int)minigameGoldEarned;
+		dayXPEarned += (int)minigameXPEarned;
+		dayGoldEarned = (int)minigameGoldEarned;
 
 
 		EndMinigame (actions.EXPLORE);
 	}
 
 	private void ExploreUpdate(){
-		
+		areaOneInfoText.text = "Player Combat Power: " + epScript.cp;
 	}
 
 	private void ExploreInput(){
@@ -1247,6 +1418,48 @@ public class Control_Script : MonoBehaviour {
 	public void TileReward(GameObject t){
 		minigameGoldEarned += t.GetComponent<TileScript> ().enemyCP;
 		minigameXPEarned += t.GetComponent<TileScript> ().enemyCP * 2;
+	}
+
+	public void TileStory(string s){
+		switch (s)
+		{
+		case "Win":
+			switch (activeArea)
+			{
+			case 1:
+				areaOneNarrativeText.text = winNarrative [(int)Random.Range (0.0f, 4.0f)];
+				break;
+			case 2:
+				break;
+			case 3:
+				break;
+			}
+			break;
+		case "Lose":
+			switch (activeArea)
+			{
+			case 1:
+				areaOneNarrativeText.text = loseNarrative [(int)Random.Range (0.0f, 4.0f)];
+				break;
+			case 2:
+				break;
+			case 3:
+				break;
+			}
+			break;
+		case "None":
+			switch (activeArea)
+			{
+			case 1:
+				areaOneNarrativeText.text = neutralNarrative [(int)Random.Range (0.0f, 4.0f)];
+				break;
+			case 2:
+				break;
+			case 3:
+				break;
+			}
+			break;
+		}
 	}
 
 
@@ -1273,12 +1486,17 @@ public class Control_Script : MonoBehaviour {
 
 	#region advertisements
 	public void StartAdvertisement(){
+		Analytics.CustomEvent("StartAdvertisement", new Dictionary<string, object>
+			{
+				{ "Time", System.DateTime.Now }
+			});
+		
 		print ("advertisement begun");
 
 		adPanel.SetActive (true);
 		adButton.gameObject.SetActive (false);
 		AddGold ((int)(minigameGoldEarned * 0.5f));
-		dayGoldEarnt += (int)(minigameGoldEarned * 0.5f);
+		dayGoldEarned += (int)(minigameGoldEarned * 0.5f);
 		minigameGoldEarned *= 1.5f;
 		Invoke ("EndAdvertisement", 5);
 	}
@@ -1322,7 +1540,10 @@ public class Control_Script : MonoBehaviour {
 	}
 
 	public void BuyGold(int tier){
-
+		Analytics.CustomEvent("BuyGold", new Dictionary<string, object>
+			{
+				{ "tier", tier }
+			});
 		switch (tier)
 			{
 			case 1:
@@ -1365,7 +1586,25 @@ public class Control_Script : MonoBehaviour {
 	}
 
 	public void BuyGems(int tier){
-		Debug.Log ("Not available");
+		Analytics.CustomEvent("BuyGem", new Dictionary<string, object>
+			{
+				{ "tier", tier }
+			});
+		switch (tier)
+		{
+		case 1:
+			Analytics.Transaction ("GemTOne", (decimal)4.95, "AUD");
+			break;
+		case 2:
+			Analytics.Transaction ("GemTTwo", (decimal)9.95f, "AUD");
+			break;
+		case 3:
+			Analytics.Transaction ("GemTThree", (decimal)24.95f, "AUD");
+			break;
+		case 4:
+			Analytics.Transaction ("GemTFour", (decimal)49.95f, "AUD");
+			break;
+		}
 	}
 
 

@@ -4,8 +4,8 @@ using System.Collections;
 
 public class FWinScript : MonoBehaviour {
 	public Text titleText, goldText, expText, levelText, expCurrentText;
-	public GameObject controlObj;
-	public Control_Script cScript;
+	private GameObject controlObj;
+	private Control_Script cScript;
 	public Button redoButton, mainButton;
 	public Button toMainButton;
 	public Button adButton;
@@ -30,5 +30,6 @@ public class FWinScript : MonoBehaviour {
 
 		adButton.onClick.AddListener (() => cScript.StartAdvertisement ());
 		adButton.gameObject.SetActive (false);
+		gameObject.SetActive (false);
 	}
 }

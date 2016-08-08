@@ -6,11 +6,14 @@ public class CWinScript : MonoBehaviour {
 
 	public Text nameText, levelText, expText, dayText, jobLevelText, weaponText, armourText;
 	public Button toMainButton;
+	public Image weaponImage;
+	public Sprite[] weaponSprites;
 
 	// Use this for initialization
 	void Start () {
-		gameObject.SetActive(false);
 		toMainButton.onClick.AddListener (() => GoToMain ());
+		gameObject.SetActive(false);
+
 	}
 
 	private void GoToMain(){

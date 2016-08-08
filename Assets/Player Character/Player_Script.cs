@@ -52,7 +52,7 @@ public class Player_Script : MonoBehaviour {
 		CheckLevelStatus();
 	}
 
-	private void CheckLevelStatus(){
+	public void CheckLevelStatus(){
 		if (currentExp >= maxExp){
 			LevelUp();
 		}
