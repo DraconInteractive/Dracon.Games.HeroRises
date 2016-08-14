@@ -48,35 +48,66 @@ public class TileScript : MonoBehaviour {
 	}
 
 	void OnEnable () {
-		if (isStartTile) {
-			hasEnemy = false;
-			pScript.MoveToTile (this.gameObject);
-		} else {
-			if (Random.Range (0.0f, 100.0f) < 25){
-				hasEnemy = true;
-			} else {
+
+		if (areaObject.GetComponent<AreaObjectScript>().completed == 0){
+			if (isStartTile) {
 				hasEnemy = false;
-			}
-		}
-
-		if (enemyDefeated){
-			hasEnemy = false;
-			SetColor (Color.green);
-		} 
-
-		if (hasEnemy) {
-
-			SetColor (Color.red);
-
-			if (Random.Range(0.0f, 100.0f) < 10){
-				hasGem = true;
+				pScript.MoveToTile (this.gameObject);
 			} else {
-				hasGem = false;
+//				if (Random.Range (0.0f, 100.0f) < 25){
+//					hasEnemy = true;
+//				} else {
+//					hasEnemy = false;
+//				}
 			}
-		} 
-		if (!hasEnemy && !enemyDefeated){
-			SetColor (Color.yellow);
+//
+//			if (enemyDefeated){
+//				hasEnemy = false;
+//				SetColor (Color.green);
+//			} 
+//
+//			if (hasEnemy) {
+//
+//				SetColor (Color.red);
+//
+//				if (Random.Range(0.0f, 100.0f) < 10){
+//					hasGem = true;
+//				} else {
+//					hasGem = false;
+//				}
+//			} 
+//			if (!hasEnemy && !enemyDefeated){
+//				SetColor (Color.yellow);
+//			}
+//
+		} else {
+			enemyDefeated = false;
+			if (isStartTile) {
+				hasEnemy = false;
+				pScript.MoveToTile (this.gameObject);
+			} else {
+				if (Random.Range (0.0f, 100.0f) < 25){
+					hasEnemy = true;
+				} else {
+					hasEnemy = false;
+				}
+			}
+				
+			if (hasEnemy) {
+
+				SetColor (Color.red);
+
+				if (Random.Range(0.0f, 100.0f) < 10){
+					hasGem = true;
+				} else {
+					hasGem = false;
+				}
+			} 
+			if (!hasEnemy && !enemyDefeated){
+				SetColor (Color.yellow);
+			}
 		}
+
 	}
 
 	public void SetColor(Color c){

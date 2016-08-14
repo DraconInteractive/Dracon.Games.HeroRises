@@ -10,6 +10,7 @@ public class Control_Script : MonoBehaviour {
 	
 	//Setup
 	public static GameObject controlObj;
+	public GameObject blurCam;
 	public GameObject mainMenu;
 	public GameObject bottomMenuCanvasObject;
 
@@ -82,10 +83,11 @@ public class Control_Script : MonoBehaviour {
 	//Work
 	public GameObject wSphere;
 	public GameObject initBlocker, leftBlocker, rightBlocker;
-	public Text wHelpText;
+	public Text wHelpText, wProgressText, wGProgressText, wEProgressText;
 	private float wInitTimer;
 	public float wInitTimerMaxStart, wInitTimerMax;
 	private float ballFalling;
+	private int wNumRight;
 
 	//Train
 	public GameObject trainArrow;
@@ -96,7 +98,7 @@ public class Control_Script : MonoBehaviour {
 	public playerObjScript epScript;
 	public GameObject areaControl;
 	public GameObject[] areaObjects;
-	public Text areaOneInfoText;
+	public Text areaOneInfoText, areaTwoInfoText;
 	public Text areaOneNarrativeText;
 	public int activeArea;
 
@@ -104,6 +106,7 @@ public class Control_Script : MonoBehaviour {
 	public string[] winNarrative;
 	public string[] loseNarrative;
 	public string[] neutralNarrative;
+
 	//Debug
 	public int invIDMax;
 
@@ -168,6 +171,10 @@ public class Control_Script : MonoBehaviour {
 			UpdateUI ();
 		}
 
+		if (Input.GetKeyDown(KeyCode.F9)){
+			SetActiveWindow (windows.FEEDBACK);
+		}
+
 		if (Input.GetKeyDown(KeyCode.Escape)){
 			if (minigameActive){
 				switch (activeGame)
@@ -207,13 +214,32 @@ public class Control_Script : MonoBehaviour {
 
 	}
 
+	public void AddGold (int i) {
+		goldObj.itemQuantity += i;
+		goldObj.SaveItemDetails ();
+	}
+
+	public void AddEXP (int i) {
+		pScript.AddExp (i);
+	}
+
+	public void AddGem(int amount) {
+		gemObj.itemQuantity += amount;
+		goldObj.SaveItemDetails ();
+	}
+
+
 	#endregion
 
 	#region ui functions
 
 	public void SetActiveWindow(windows window){
 		if (activeWindow == window){
-			activeWindow = windows.NONE;
+			if (window == windows.NONE){
+				activeWindow = windows.MENU;
+			} else {
+				activeWindow = windows.NONE;
+			}
 		} else {
 			activeWindow = window;
 			Analytics.CustomEvent("Opening Window", new Dictionary<string, object>
@@ -403,7 +429,8 @@ public class Control_Script : MonoBehaviour {
 
 	public void ReturnToMainMenu(){
 		SaveGameVariables();
-		GameObject.FindGameObjectWithTag ("BlurCam").SetActive (true);
+		uiActive = true;
+		blurCam.SetActive (true);
 		mainMenu.SetActive(true);
 
 	}
@@ -426,30 +453,8 @@ public class Control_Script : MonoBehaviour {
 	}
 
 	public void SaveGameVariables(){
-		switch (activeWindow)
-		{
-		case windows.ACTION:
-			PlayerPrefs.SetInt("ActiveWindow", 0);
-			break;
-		case windows.CHARACTER:
-			PlayerPrefs.SetInt("ActiveWindow", 1);
-			break;
-		case windows.MENU:
-			PlayerPrefs.SetInt("ActiveWindow", 2);
-			break;
-		case windows.WEAPONS:
-			PlayerPrefs.SetInt("ActiveWindow", 3);
-			break;
-		case windows.ARMOUR:
-			PlayerPrefs.SetInt("ActiveWindow", 4);
-			break;
-		case windows.FEEDBACK:
-			PlayerPrefs.SetInt("ActiveWindow", 5);
-			break;
-		case windows.NONE:
-			PlayerPrefs.SetInt("ActiveWindow", 6);
-			break;
-		}
+
+		SetActiveWindow (windows.NONE);
 
 		PlayerPrefs.SetString("PlayerName", pScript.playerName);
 		PlayerPrefs.SetInt("PlayerLevel", pScript.level);
@@ -477,36 +482,16 @@ public class Control_Script : MonoBehaviour {
 			quest.SaveQuestStatus();
 		}
 
+		foreach (GameObject g in areaObjects){
+			g.transform.GetChild(0).gameObject.GetComponent<AreaObjectScript> ().SaveArea ();
+		}
+
 		UpdateUI();
 
 	}
 
 	public void LoadGameVariables(){
-		int i = PlayerPrefs.GetInt("ActiveWindow");
-		switch (i)
-		{
-		case 0:
-			SetActiveWindow(windows.ACTION);
-			break;
-		case 1:
-			SetActiveWindow(windows.CHARACTER);
-			break;
-		case 2:
-			SetActiveWindow(windows.MENU);
-			break;
-		case 3:
-			SetActiveWindow(windows.WEAPONS);
-			break;
-		case 4:
-			SetActiveWindow(windows.ARMOUR);
-			break;
-		case 5:
-			SetActiveWindow(windows.FEEDBACK);
-			break;
-		case 6:
-			SetActiveWindow(windows.NONE);
-			break;
-		}
+		SetActiveWindow (windows.NONE);
 
 		pScript.playerName = PlayerPrefs.GetString("PlayerName");
 		pScript.level = PlayerPrefs.GetInt("PlayerLevel");
@@ -549,6 +534,10 @@ public class Control_Script : MonoBehaviour {
 			actionWindow.GetComponent<AWinScript>().SetEnergy(true);
 		} else {
 			actionWindow.GetComponent<AWinScript>().SetEnergy(false);
+		}
+
+		foreach (GameObject g in areaObjects){
+			g.transform.GetChild(0).gameObject.GetComponent<AreaObjectScript> ().LoadArea ();
 		}
 
 		UpdateUI();
@@ -598,6 +587,11 @@ public class Control_Script : MonoBehaviour {
 		}
 
 		bottomMenu.GetComponent<Bottom_Menu_Script> ().tutorialPanelOne.SetActive (true);
+
+
+		foreach (GameObject g in areaObjects){
+			g.transform.GetChild(0).gameObject.GetComponent<AreaObjectScript> ().LoadDefaultArea ();
+		}
 
 		UpdateUI();
 	}
@@ -731,17 +725,7 @@ public class Control_Script : MonoBehaviour {
 				{ "playerGold", goldObj.itemQuantity}
 			});
 	}
-
-	public void AddGold(int amount){
-		goldObj.itemQuantity += amount;
-		goldObj.SaveItemDetails ();
-	}
-
-	public void AddGem(int amount) {
-		gemObj.itemQuantity += amount;
-		goldObj.SaveItemDetails ();
-	}
-
+		
 	InventoryObject GetInventoryItem(string iName){
 		foreach (InventoryObject i in inventory){
 			if (i.itemName == iName){
@@ -1063,8 +1047,8 @@ public class Control_Script : MonoBehaviour {
 	private void JobLevelUp(){
 		jobCXP -= jobMXP;
 		jobLevel++;
-		jobMXP = Mathf.RoundToInt(jobMXP * 1.5f);
-		jobEXPAdd = Mathf.RoundToInt(jobEXPAdd * 1.4f);
+		jobMXP = Mathf.RoundToInt(jobMXP * 1.1f);
+		jobEXPAdd = Mathf.RoundToInt(jobEXPAdd * 1.05f);
 	}
 
 	#endregion
@@ -1130,6 +1114,7 @@ public class Control_Script : MonoBehaviour {
 			eMiniObject.SetActive (false);
 			tMiniObject.SetActive (false);
 			wMiniObject.SetActive (false);
+
 			break;
 		}
 	}
@@ -1145,6 +1130,7 @@ public class Control_Script : MonoBehaviour {
 
 		minigameGoldEarned = 0;
 		minigameXPEarned = 0;
+		wNumRight = 0;
 	}
 
 	public void ResetBall(bool match){
@@ -1171,8 +1157,13 @@ public class Control_Script : MonoBehaviour {
 			minigameGoldEarned += jobLevel;
 			minigameXPEarned += pScript.expAdd;
 			AddJobEXP (jobEXPAdd);
-			print ("Gold: " + minigameGoldEarned + ", XP: " + minigameXPEarned);
+			wNumRight++;
+			wProgressText.text = wNumRight.ToString ();
+			wGProgressText.text = minigameGoldEarned.ToString ();
+			wEProgressText.text = minigameXPEarned.ToString ();
+//			print ("Gold: " + minigameGoldEarned + ", XP: " + minigameXPEarned);
 		}
+			
 	}
 
 	private void WorkUpdate(){
@@ -1211,7 +1202,7 @@ public class Control_Script : MonoBehaviour {
 
 	private void StartTrain (){
 		bottomMenuCanvasObject.SetActive (false);
-		ArrowScript a = trainArrow.GetComponent<ArrowScript> ();
+//		ArrowScript a = trainArrow.GetComponent<ArrowScript> ();
 
 		minigameGoldEarned = 0;
 		minigameXPEarned = 0;
@@ -1332,6 +1323,7 @@ public class Control_Script : MonoBehaviour {
 		minigameXPEarned = 0;
 
 		areaControl.SetActive (true);
+
 		foreach (GameObject g in areaObjects){
 			g.SetActive (false);
 		}
@@ -1394,7 +1386,19 @@ public class Control_Script : MonoBehaviour {
 	}
 
 	private void ExploreUpdate(){
-		areaOneInfoText.text = "Player Combat Power: " + epScript.cp;
+		bool complete = false;
+		foreach (GameObject g in areaObjects){
+			if (g.activeSelf){
+				int a = g.transform.GetChild (0).gameObject.GetComponent<AreaObjectScript> ().completed;
+				if (a == 0){
+					complete = false;
+				} else {
+					complete = true;
+				}
+			}
+		}
+		areaOneInfoText.text = "Player Combat Power: " + epScript.cp + "  |  Area Completed Before: " + complete.ToString();
+		areaTwoInfoText.text = "Player Combat Power: " + epScript.cp + "  |  Area Completed Before: " + complete.ToString();
 	}
 
 	private void ExploreInput(){
@@ -1416,8 +1420,8 @@ public class Control_Script : MonoBehaviour {
 	}
 
 	public void TileReward(GameObject t){
-		minigameGoldEarned += t.GetComponent<TileScript> ().enemyCP;
-		minigameXPEarned += t.GetComponent<TileScript> ().enemyCP * 2;
+		minigameGoldEarned += t.GetComponent<TileScript> ().enemyCP / 2;
+		minigameXPEarned += t.GetComponent<TileScript> ().enemyCP;
 	}
 
 	public void TileStory(string s){
@@ -1462,6 +1466,27 @@ public class Control_Script : MonoBehaviour {
 		}
 	}
 
+	public void CompleteExploreArea(int areaNum) {
+		switch (areaNum)
+		{
+		case 0:
+			print ("Invalid Area Completion Number (CompleteExploreArea on c, called from playerObjScript");
+			break;
+		case 1:
+			minigameGoldEarned += 500;
+			minigameXPEarned += 250;
+			break;
+		case 2:
+			minigameGoldEarned += 1500;
+			minigameXPEarned += 750;
+			break;
+		case 3:
+			minigameGoldEarned += 5000;
+			minigameXPEarned += 1500;
+			break;
+		}
+	}
+
 
 	#endregion
 	public void EndMinigame(actions a){
@@ -1476,8 +1501,9 @@ public class Control_Script : MonoBehaviour {
 		bottomMenuCanvasObject.SetActive (true);
 		activeScheme = controlSchemes.NONE;
 		StartMinigame(minigames.NONE);
-		SetActiveWindow(windows.FEEDBACK);
 		UpdateFeedbackWindow (a, (int)minigameXPEarned, (int)minigameGoldEarned);
+		SetActiveWindow(windows.FEEDBACK);
+
 		SaveGameVariables ();
 
 	}

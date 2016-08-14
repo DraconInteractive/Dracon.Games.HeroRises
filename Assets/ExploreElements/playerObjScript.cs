@@ -28,6 +28,7 @@ public class playerObjScript : MonoBehaviour {
 	}
 
 	public void MoveInDirection(string s){
+		CalculatePlayerCP ();
 		if (!canMove){
 			return;
 		}
@@ -130,8 +131,23 @@ public class playerObjScript : MonoBehaviour {
 
 			if (AreaComplete()){
 				EmitParticles (Color.yellow);
+				int areaNum = 0;
+				int areaAlreadyComplete = 0;
+				foreach (GameObject g in c.areaObjects){
+					if (g.activeSelf){
+						areaAlreadyComplete = g.transform.GetChild (0).gameObject.GetComponent<AreaObjectScript> ().completed;
+						g.transform.GetChild (0).gameObject.GetComponent<AreaObjectScript> ().completed = 1;
+						areaNum = g.transform.GetChild (0).gameObject.GetComponent<AreaObjectScript> ().aNum;
+						c.SaveGameVariables ();
+						break;
+					}
+				}
+				if (areaAlreadyComplete != 1){
+					c.CompleteExploreArea (areaNum);
+				}
+
 				canMove = false;
-				Invoke ("EndExploration", 2);
+				Invoke ("EndExploration", 3);
 			} else {
 				EmitParticles (Color.cyan);
 			}
@@ -139,8 +155,23 @@ public class playerObjScript : MonoBehaviour {
 			print ("Won Combat - Normal");
 			if (AreaComplete()){
 				EmitParticles (Color.yellow);
+				int areaNum = 0;
+				int areaAlreadyComplete = 0;
+				foreach (GameObject g in c.areaObjects){
+					if (g.activeSelf){
+						areaAlreadyComplete = g.transform.GetChild (0).gameObject.GetComponent<AreaObjectScript> ().completed;
+						g.transform.GetChild (0).gameObject.GetComponent<AreaObjectScript> ().completed = 1;
+						areaNum = g.transform.GetChild (0).gameObject.GetComponent<AreaObjectScript> ().aNum;
+						c.SaveGameVariables ();
+						break;
+					}
+				}
+				if (areaAlreadyComplete != 1){
+					c.CompleteExploreArea (areaNum);
+				}
+
 				canMove = false;
-				Invoke ("EndExploration", 2);
+				Invoke ("EndExploration", 3);
 			} else {
 				EmitParticles (Color.green);
 			}

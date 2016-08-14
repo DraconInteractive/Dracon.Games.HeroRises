@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
 
-public class House01_Script : MonoBehaviour {
+public class Armour_Shop_Script : MonoBehaviour {
+
 	Material[] myMaterials;
 	Color[] startingColor;
 	GameObject controlObj;
@@ -28,16 +28,16 @@ public class House01_Script : MonoBehaviour {
 	}
 
 	public void OnMouseExit(){
-		
+
 		foreach (Material m in myMaterials){
 			m.color = startingColor[System.Array.IndexOf(myMaterials, m)];
 		}
-		
+
 	}
 
 	void OnMouseDown(){
 		if (!cScript.uiActive){
-			controlObj.GetComponent<Control_Script>().SetActiveWindow(Control_Script.windows.WEAPONS);
+			controlObj.GetComponent<Control_Script>().SetActiveWindow(Control_Script.windows.ARMOUR);
 		}
 	}
 }

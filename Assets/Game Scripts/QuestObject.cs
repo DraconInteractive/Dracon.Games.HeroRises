@@ -35,25 +35,23 @@ public class QuestObject : ScriptableObject {
 
 	public void LoadQuestStatus(){
 		int i = PlayerPrefs.GetInt(questName + "Status");
-		int l = 0;
 		switch (i)
 		{
 		case 0:
 			questStatus = questStatuses.IDLE;
-			foreach (bool b in questRequirements){
-				questRequirements[l] = false;
-				l++;
+			for (int a = 0; a < questRequirements.Length; a++){
+				questRequirements [i] = false;
 			}
+
 			break;
 		case 1:
 			questStatus = questStatuses.STARTED;
 			int p = PlayerPrefs.GetInt(questName + "REQSolved");
-			foreach (bool b in questRequirements){
-				if (p > 0){
-					questRequirements[l] = true;
+			for (int a = 0; a < questRequirements.Length; a++){
+				if ( p > 0){
+					questRequirements [i] = true;
 					p -= 1;
 				}
-				l++;
 			}
 			break;
 		case 2:
@@ -64,10 +62,9 @@ public class QuestObject : ScriptableObject {
 
 	public void ResetQuestStatus(){
 		questStatus = questStatuses.IDLE;
-		int l = 0;
-		foreach (bool b in questRequirements){
-			questRequirements[l] = false;
-			l++;
+
+		for (int a = 0; a < questRequirements.Length; a++){
+			questRequirements [a] = false;
 		}
 	}
 }
