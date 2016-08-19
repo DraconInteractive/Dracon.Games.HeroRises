@@ -31,6 +31,8 @@ public class Wizard_Tower_Script : MonoBehaviour {
 	void OnMouseDown(){
 		if (!c.uiActive){
 			controlObj.GetComponent<Control_Script>().SetActiveWindow(Control_Script.windows.MICROTRANSACTIONS);
+			c.PlaySound (Control_Script.audioThing.SELECT);
+
 		}
 
 	}

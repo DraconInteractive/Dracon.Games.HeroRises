@@ -20,7 +20,6 @@ public class Bottom_Menu_Script : MonoBehaviour {
 
 		cScript.bottomMenu = this.gameObject.GetComponent<Bottom_Menu_Script>();
 		characterButton.onClick.AddListener(() => cScript.SetActiveWindow(Control_Script.windows.CHARACTER));
-		actionButton.onClick.AddListener(() => cScript.SetActiveWindow(Control_Script.windows.ACTION));
 		menuButton.onClick.AddListener(() => cScript.SetActiveWindow(Control_Script.windows.MENU));
 
 		tutButton1.onClick.AddListener (() => TutButtonOne ());
@@ -35,14 +34,20 @@ public class Bottom_Menu_Script : MonoBehaviour {
 	public void TutButtonOne () {
 		tutorialPanelOne.SetActive (false);
 		tutorialPanelTwo.SetActive (true);
+		cScript.PlaySound (Control_Script.audioThing.SELECT);
+
 	}
 
 	public void TutButtonTwo () {
 		tutorialPanelTwo.SetActive (false);
 		tutorialPanelThree.SetActive (true);
+		cScript.PlaySound (Control_Script.audioThing.SELECT);
+
 	}
 
 	public void TutButtonThree () {
 		tutorialPanelThree.SetActive (false);
+		cScript.PlaySound (Control_Script.audioThing.SELECT);
+
 	}
 }

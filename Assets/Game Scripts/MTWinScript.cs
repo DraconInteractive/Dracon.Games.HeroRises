@@ -29,6 +29,8 @@ public class MTWinScript : MonoBehaviour {
 
 	private void GoToMain(){
 		c.SetActiveWindow (Control_Script.windows.NONE);
+		c.PlaySound (Control_Script.audioThing.SELECT);
+
 	}
 
 	public void DisplayGoldValue(GameObject g, int i){

@@ -30,6 +30,8 @@ public class Main_Menu_Script : MonoBehaviour {
 	public void NewGame(){
 		startWindow.SetActive(true);
 		stage1.SetActive (false);
+		cScript.PlaySound (Control_Script.audioThing.SELECT);
+
 	}
 
 	private void ContinueGame(){
@@ -38,6 +40,8 @@ public class Main_Menu_Script : MonoBehaviour {
 		cScript.gameActive = true;
 		mainCanvas.GetComponent<Canvas> ().enabled = true;
 		GameObject.FindGameObjectWithTag ("BlurCam").SetActive (false);
+		cScript.PlaySound (Control_Script.audioThing.SELECT);
+
 		this.gameObject.SetActive(false);
 	}
 
@@ -55,6 +59,8 @@ public class Main_Menu_Script : MonoBehaviour {
 		startWindow.SetActive(false);
 		mainCanvas.GetComponent<Canvas> ().enabled = true;
 		GameObject.FindGameObjectWithTag ("BlurCam").SetActive (false);
+		cScript.PlaySound (Control_Script.audioThing.SELECT);
+
 		this.gameObject.SetActive (false);
 	}
 

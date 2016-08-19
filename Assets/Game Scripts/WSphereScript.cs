@@ -9,8 +9,10 @@ public class WSphereScript : MonoBehaviour {
 	public Vector3 grav;
 	public float gravForce, initGravForce;
 	private Rigidbody rb;
+	private ParticleSystem ps;
 	// Use this for initialization
 	void Start () {
+		ps = GetComponent<ParticleSystem> ();
 		c = Control_Script.controlObj.GetComponent<Control_Script> ();
 		rb = GetComponent<Rigidbody> ();
 		startPos = transform.position;
@@ -51,6 +53,7 @@ public class WSphereScript : MonoBehaviour {
 	}
 
 	private void ResetSelf(bool match){
+		ps.Emit (50);
 		transform.position = startPos;
 		c.ResetBall (match);
 		float colR = Random.Range (0.0f, 3.0f);
@@ -70,6 +73,7 @@ public class WSphereScript : MonoBehaviour {
 			break;
 		}
 		SetGrav ();
+
 	}
 
 	private void SetGrav(){

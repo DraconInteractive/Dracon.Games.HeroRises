@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Analytics;
 using UnityEngine.UI;
 using System.Collections;
@@ -26,12 +27,20 @@ public class Control_Script : MonoBehaviour {
 
 	public bool uiActive;
 
+	//Audio
+	public GameObject backgroundAudio;
+	AudioSource camAS;
+	AudioSource bgAS;
+	public AudioClip ambientAC, minigameAC, winAC, loseAC, selectAC, workAC;
+
+	public enum audioThing {AMBIENT, MINIGAME, WIN, LOSE, SELECT, WORK};
+
 	//Windows
 	public Bottom_Menu_Script bottomMenu;
-	public GameObject characterWindow, actionWindow, menuWindow, weaponsWindow, armourWindow, feedbackWindow, mtWindow;
+	public GameObject characterWindow, menuWindow, weaponsWindow, armourWindow, feedbackWindow, mtWindow;
 	public GameObject dojoWindow, blacksmithWindow;
 
-	public enum windows {CHARACTER, ACTION, MENU, WEAPONS, ARMOUR, FEEDBACK, MICROTRANSACTIONS, BLACKSMITH, DOJO, NONE};
+	public enum windows {CHARACTER, MENU, WEAPONS, ARMOUR, FEEDBACK, MICROTRANSACTIONS, BLACKSMITH, DOJO, NONE};
 	public windows activeWindow;
 
 	public Button sabButton, twoHButton, dwButton;
@@ -48,8 +57,7 @@ public class Control_Script : MonoBehaviour {
 
 	//Actions
 
-	public enum actions {WORK, TRAIN, EXPLORE, REST, ADVERTISEMENT};
-	public Slider energySlider;
+	public enum actions {WORK, TRAIN, EXPLORE, ADVERTISEMENT};
 	public int jobLevel, jobCXP, jobMXP, jobEXPAdd;
 
 	//Inventory
@@ -79,6 +87,8 @@ public class Control_Script : MonoBehaviour {
 
 	private Camera mainCam;
 	private Vector3 mainCamStartPos;
+
+	private int mRandomCounter;
 
 	//Work
 	public GameObject wSphere;
@@ -120,6 +130,8 @@ public class Control_Script : MonoBehaviour {
 		controlObj = this.gameObject;
 		mainCam = Camera.main;
 		mainCamStartPos = mainCam.transform.position;
+		camAS = mainCam.GetComponent<AudioSource> ();
+		bgAS = backgroundAudio.GetComponent<AudioSource> ();
 	}
 	// Use this for initialization
 	void Start () {
@@ -148,7 +160,11 @@ public class Control_Script : MonoBehaviour {
 				{ "Time", System.DateTime.Now },
 			});
 
-		Analytics.SetUserGender (Gender.Male);
+		mRandomCounter = 0;
+
+		PlaySound (audioThing.AMBIENT);
+
+		StartCoroutine ("TestIteration");
 	}
 	
 	// Update is called once per frame
@@ -172,7 +188,7 @@ public class Control_Script : MonoBehaviour {
 		}
 
 		if (Input.GetKeyDown(KeyCode.F9)){
-			SetActiveWindow (windows.FEEDBACK);
+			UpdateUI ();
 		}
 
 		if (Input.GetKeyDown(KeyCode.Escape)){
@@ -231,6 +247,39 @@ public class Control_Script : MonoBehaviour {
 
 	#endregion
 
+	#region Audio Functions
+
+	public void PlaySound(audioThing clip) {
+		print (clip.ToString ());
+		switch (clip)
+		{
+		case audioThing.AMBIENT:
+			bgAS.Stop ();
+			bgAS.clip = ambientAC;
+			bgAS.Play ();
+			break;
+		case audioThing.MINIGAME:
+			bgAS.Stop ();
+			bgAS.clip = minigameAC;
+			bgAS.Play ();
+			break;
+		case audioThing.LOSE:
+			camAS.PlayOneShot (loseAC);
+			break;
+		case audioThing.WIN:
+			camAS.PlayOneShot (winAC);
+			break;
+		case audioThing.SELECT:
+			camAS.PlayOneShot (selectAC);
+			break;
+		case audioThing.WORK:
+			camAS.PlayOneShot (workAC);
+			break;
+		}
+	}
+
+	#endregion
+
 	#region ui functions
 
 	public void SetActiveWindow(windows window){
@@ -250,26 +299,12 @@ public class Control_Script : MonoBehaviour {
 
 		switch (activeWindow)
 		{
-		case windows.ACTION:
 
-			actionWindow.SetActive (true);
-
-			characterWindow.SetActive (false);
-			menuWindow.SetActive (false);
-			weaponsWindow.SetActive (false);
-			armourWindow.SetActive (false);
-			feedbackWindow.SetActive (false);
-			mtWindow.SetActive (false);
-			blacksmithWindow.SetActive (false);
-			dojoWindow.SetActive (false);
-
-			break;
 		case windows.CHARACTER:
 			
 			characterWindow.SetActive(true);
 
 			menuWindow.SetActive(false);
-			actionWindow.SetActive(false);
 			weaponsWindow.SetActive(false);
 			armourWindow.SetActive(false);
 			feedbackWindow.SetActive(false);
@@ -281,7 +316,6 @@ public class Control_Script : MonoBehaviour {
 			
 			menuWindow.SetActive(true);
 
-			actionWindow.SetActive(false);
 			characterWindow.SetActive(false);
 			weaponsWindow.SetActive(false);
 			armourWindow.SetActive(false);
@@ -294,7 +328,6 @@ public class Control_Script : MonoBehaviour {
 			weaponsWindow.SetActive(true);
 
 			menuWindow.SetActive(false);
-			actionWindow.SetActive(false);
 			characterWindow.SetActive(false);
 			armourWindow.SetActive(false);
 			feedbackWindow.SetActive(false);
@@ -305,7 +338,6 @@ public class Control_Script : MonoBehaviour {
 		case windows.ARMOUR:
 			armourWindow.SetActive(true);
 
-			actionWindow.SetActive(false);
 			characterWindow.SetActive(false);
 			menuWindow.SetActive(false);
 			weaponsWindow.SetActive(false);
@@ -318,7 +350,6 @@ public class Control_Script : MonoBehaviour {
 		case windows.FEEDBACK:
 			feedbackWindow.SetActive(true);
 
-			actionWindow.SetActive(false);
 			characterWindow.SetActive(false);
 			menuWindow.SetActive(false);
 			weaponsWindow.SetActive(false);
@@ -330,7 +361,6 @@ public class Control_Script : MonoBehaviour {
 		case windows.MICROTRANSACTIONS:
 			mtWindow.SetActive(true);
 
-			actionWindow.SetActive(false);
 			characterWindow.SetActive(false);
 			menuWindow.SetActive(false);
 			weaponsWindow.SetActive(false);
@@ -344,7 +374,6 @@ public class Control_Script : MonoBehaviour {
 			blacksmithWindow.SetActive (true);
 
 			mtWindow.SetActive (false);
-			actionWindow.SetActive (false);
 			characterWindow.SetActive (false);
 			menuWindow.SetActive (false);
 			weaponsWindow.SetActive (false);
@@ -358,7 +387,6 @@ public class Control_Script : MonoBehaviour {
 
 			blacksmithWindow.SetActive (false);
 			mtWindow.SetActive (false);
-			actionWindow.SetActive (false);
 			characterWindow.SetActive (false);
 			menuWindow.SetActive (false);
 			weaponsWindow.SetActive (false);
@@ -367,7 +395,6 @@ public class Control_Script : MonoBehaviour {
 			break;
 		case windows.NONE:
 			mtWindow.SetActive(false);
-			actionWindow.SetActive(false);
 			characterWindow.SetActive(false);
 			menuWindow.SetActive(false);
 			weaponsWindow.SetActive(false);
@@ -387,6 +414,8 @@ public class Control_Script : MonoBehaviour {
 
 	public void MTBUTTON(){
 		SetActiveWindow(windows.MICROTRANSACTIONS);
+		PlaySound (Control_Script.audioThing.SELECT);
+
 	}
 
 	public void UpdateUI(){
@@ -418,16 +447,11 @@ public class Control_Script : MonoBehaviour {
 
 		bottomMenu.goldText.text = "Gold: " + goldObj.itemQuantity.ToString() + "   |   Gems: " + gemObj.itemQuantity.ToString();
 
-		energySlider.value = dayTime;
-
 		UpdateEquipmentButtonUI();
 	}
 
-	public void RedoButton(){
-		SetActiveWindow(windows.ACTION);
-	}
-
 	public void ReturnToMainMenu(){
+		SetActiveWindow (Control_Script.windows.NONE);
 		SaveGameVariables();
 		uiActive = true;
 		blurCam.SetActive (true);
@@ -437,6 +461,7 @@ public class Control_Script : MonoBehaviour {
 
 	public void MainButton(){
 		SetActiveWindow(windows.NONE);
+		PlaySound (Control_Script.audioThing.SELECT);
 	}
 
 	#endregion
@@ -454,7 +479,7 @@ public class Control_Script : MonoBehaviour {
 
 	public void SaveGameVariables(){
 
-		SetActiveWindow (windows.NONE);
+//		SetActiveWindow (windows.NONE);
 
 		PlayerPrefs.SetString("PlayerName", pScript.playerName);
 		PlayerPrefs.SetInt("PlayerLevel", pScript.level);
@@ -530,12 +555,6 @@ public class Control_Script : MonoBehaviour {
 			quest.LoadQuestStatus();
 		}
 
-		if (dayTime < 1){
-			actionWindow.GetComponent<AWinScript>().SetEnergy(true);
-		} else {
-			actionWindow.GetComponent<AWinScript>().SetEnergy(false);
-		}
-
 		foreach (GameObject g in areaObjects){
 			g.transform.GetChild(0).gameObject.GetComponent<AreaObjectScript> ().LoadArea ();
 		}
@@ -601,13 +620,10 @@ public class Control_Script : MonoBehaviour {
 	#region action functions
 
 	public void ExecuteAction(actions a){
-		
-		dayTime += 0.1f;
 
 		switch (a)
 		{
 		case actions.EXPLORE:
-			StartMinigame (minigames.EXPLORE);
 			Analytics.CustomEvent("StartExplore", new Dictionary<string, object>
 				{
 					{ "startGold", goldObj.itemQuantity },
@@ -617,17 +633,7 @@ public class Control_Script : MonoBehaviour {
 					{ "playerCP", epScript.cp},
 					{ "playerLevel", pScript.level}
 				});
-			break;
-		case actions.REST:
-			Analytics.CustomEvent("EndDay", new Dictionary<string, object>
-				{
-					{ "dayGoldEarned", dayGoldEarned },
-					{ "dayXPEarned", dayXPEarned },
-					{ "currentGold", goldObj.itemQuantity},
-					{ "currentXP", pScript.currentExp},
-					{ "currentLevel", pScript.level}
-				});
-			FinishDay();
+			StartMinigame (minigames.EXPLORE);
 
 			break;
 		case actions.TRAIN:
@@ -651,35 +657,12 @@ public class Control_Script : MonoBehaviour {
 			StartMinigame (minigames.WORK);
 			break;
 		}
-
-//		dayGoldEarned += goldAdd;
-//		dayXPEarned += expAdd;
-
-
-		if (dayTime < 1){
-			actionWindow.GetComponent<AWinScript>().SetEnergy(true);
-		} else {
-			actionWindow.GetComponent<AWinScript>().SetEnergy(false);
-		}
-		if (a != actions.REST){
-			SetActiveWindow (windows.NONE);
-		}
-
-
 		UpdateUI();
 	}
 
 	public void UpdateFeedbackWindow(actions a, int expAdd, int goldAdd){
 
-		if (a == actions.REST){
-			feedbackTitleText.text = a.ToString();
-			goldAddText.text = "Day: " + (day - 1).ToString() + " Finished";
-			expAddText.text = "";
-			expCurrentText.text = "Gold Earned Today: " + dayGoldEarned;
-			levelCurrentText.text = "Experience Earned Today: " + dayXPEarned;
-			dayGoldEarned = 0;
-			dayXPEarned = 0;
-		} else if (a == actions.ADVERTISEMENT){
+		if (a == actions.ADVERTISEMENT){
 			feedbackTitleText.text = a.ToString();
 			expAddText.text = "Experience Earned: " + expAdd.ToString();
 			goldAddText.text = "Gold Earned: " + goldAdd.ToString() + " (+150%)";
@@ -692,17 +675,6 @@ public class Control_Script : MonoBehaviour {
 			expCurrentText.text = "Current Experience: " + pScript.currentExp.ToString() + " / " + pScript.maxExp.ToString();
 			levelCurrentText.text = "Current Level: " + pScript.level.ToString();
 		}
-
-	}
-
-	public void FinishDay(){
-		day ++;
-		dayTime = 0;
-		SaveGameVariables();
-		UpdateUI();
-
-		SetActiveWindow (windows.FEEDBACK);
-		UpdateFeedbackWindow (actions.REST, dayGoldEarned, dayXPEarned);
 
 	}
 
@@ -744,10 +716,11 @@ public class Control_Script : MonoBehaviour {
 		foreach (InventoryObject i in inventory){
 			if (!itemBought){
 				if (i.type == InventoryObject.itemTypes.SAB && i.stage == weaponStage && eWeapon != i && goldObj.itemQuantity > i.cost){
+					PlaySound (Control_Script.audioThing.SELECT);
+
 					eWeapon = i;
 					AddGold (i.cost * -1);
 
-					print ("Equipped: " + eWeapon.itemName + " as weapon");
 					if (weaponStage != maxWeaponStage){
 						weaponStage++;
 					}
@@ -766,10 +739,11 @@ public class Control_Script : MonoBehaviour {
 		foreach (InventoryObject i in inventory){
 			if (!itemBought){
 				if (i.type == InventoryObject.itemTypes.TWOH && i.stage == weaponStage && eWeapon != i && goldObj.itemQuantity > i.cost){
+					PlaySound (Control_Script.audioThing.SELECT);
+
 					eWeapon = i;
 					AddGold (i.cost * -1);
 
-					print ("Equipped: " + eWeapon.itemName + " as weapon");
 					if (weaponStage != maxWeaponStage){
 						weaponStage++;
 					}
@@ -789,10 +763,11 @@ public class Control_Script : MonoBehaviour {
 		foreach (InventoryObject i in inventory){
 			if (!itemBought){
 				if (i.type == InventoryObject.itemTypes.DW && i.stage == weaponStage && eWeapon != i && goldObj.itemQuantity > i.cost){
+					PlaySound (Control_Script.audioThing.SELECT);
+
 					eWeapon = i;
 					AddGold (i.cost * -1);
 
-					print ("Equipped: " + eWeapon.itemName + " as weapon");
 					if (weaponStage != maxWeaponStage){
 						weaponStage++;
 					}
@@ -815,6 +790,8 @@ public class Control_Script : MonoBehaviour {
 					if (i.stage == (armourStage - 1)){
 						if (goldObj.itemQuantity > i.cost){
 							if (eArmour != i){
+								PlaySound (Control_Script.audioThing.SELECT);
+
 								eArmour = i;
 								AddGold (i.cost * -1);
 								if (i.stage + 1 <= maxArmourStage){
@@ -845,6 +822,8 @@ public class Control_Script : MonoBehaviour {
 					if (i.stage == (armourStage)){
 						if (goldObj.itemQuantity > i.cost){
 							if (eArmour != i){
+								PlaySound (Control_Script.audioThing.SELECT);
+
 								eArmour = i;
 								AddGold (i.cost * -1);
 								if (i.stage + 1 != maxArmourStage){
@@ -874,6 +853,8 @@ public class Control_Script : MonoBehaviour {
 					if (i.stage == (armourStage + 1)){
 						if (goldObj.itemQuantity > i.cost){
 							if (eArmour != i){
+								PlaySound (Control_Script.audioThing.SELECT);
+
 								eArmour = i;
 								AddGold (i.cost * -1);
 								if (i.stage + 1 != maxArmourStage){
@@ -1117,9 +1098,12 @@ public class Control_Script : MonoBehaviour {
 
 			break;
 		}
+
+		SetActiveWindow (windows.NONE);
 	}
 	#region work
 	public void StartWork(){
+		PlaySound (audioThing.MINIGAME);
 		mainCam.transform.position += mainCam.transform.forward * 2;
 		initBlocker.SetActive (true);
 		leftBlocker.SetActive (false);
@@ -1139,6 +1123,7 @@ public class Control_Script : MonoBehaviour {
 		rightBlocker.SetActive (false);
 
 		if (!match){
+			PlaySound (audioThing.LOSE);
 			Analytics.CustomEvent("EndWork", new Dictionary<string, object>
 				{
 					{ "goldEarned", minigameGoldEarned },
@@ -1152,6 +1137,7 @@ public class Control_Script : MonoBehaviour {
 			wSphere.GetComponent<WSphereScript> ().gravForce = wSphere.GetComponent<WSphereScript>().initGravForce;
 			wInitTimerMax = wInitTimerMaxStart;
 		} else {
+			PlaySound (audioThing.WORK);
 			wHelpText.gameObject.SetActive (false);
 			wSphere.GetComponent<WSphereScript> ().gravForce += 10;
 			minigameGoldEarned += jobLevel;
@@ -1177,19 +1163,23 @@ public class Control_Script : MonoBehaviour {
 
 
 	public void WorkInput(){
+		
 		if (Input.GetKeyDown(KeyCode.A)){
+			PlaySound (audioThing.SELECT);
 			leftBlocker.SetActive (true);
 			initBlocker.SetActive (false);
 			rightBlocker.SetActive (false);
 		}
 
 		if (Input.GetKeyDown(KeyCode.D)){
+			PlaySound (audioThing.SELECT);
 			rightBlocker.SetActive (true);
 			initBlocker.SetActive (false);
 			leftBlocker.SetActive (false);
 		}
 
 		if (Input.GetKeyDown(KeyCode.S)){
+			PlaySound (audioThing.SELECT);
 			initBlocker.SetActive (false);
 			leftBlocker.SetActive (false);
 			rightBlocker.SetActive (false);
@@ -1203,7 +1193,7 @@ public class Control_Script : MonoBehaviour {
 	private void StartTrain (){
 		bottomMenuCanvasObject.SetActive (false);
 //		ArrowScript a = trainArrow.GetComponent<ArrowScript> ();
-
+		PlaySound (audioThing.MINIGAME);
 		minigameGoldEarned = 0;
 		minigameXPEarned = 0;
 		trainTimerMax = trainTimerMaxStart;
@@ -1287,12 +1277,14 @@ public class Control_Script : MonoBehaviour {
 	}
 
 	private void TrainSuccess(){
+		PlaySound (audioThing.WORK);
 		minigameXPEarned += pScript.expAdd * 2.5f;
 		trainArrow.GetComponent<ArrowScript> ().SetRandomDirection ();
 		ResetTrainTimer ();
 	}
 
 	private void TrainFail(){
+		PlaySound (audioThing.LOSE);
 		Analytics.CustomEvent("EndTrain", new Dictionary<string, object>
 			{
 				{ "xpEarned", minigameXPEarned }
@@ -1318,7 +1310,7 @@ public class Control_Script : MonoBehaviour {
 
 	private void StartExplore() {
 		bottomMenuCanvasObject.SetActive (false);
-
+		PlaySound (audioThing.MINIGAME);
 		minigameGoldEarned = 0;
 		minigameXPEarned = 0;
 
@@ -1367,7 +1359,7 @@ public class Control_Script : MonoBehaviour {
 			neutralNarrative [4] = "You made it! ... ... ... ... Now what?";
 		}
 
-
+		SetActiveWindow (windows.NONE);
 	}
 
 	public void EndExplore(){
@@ -1490,13 +1482,46 @@ public class Control_Script : MonoBehaviour {
 
 	#endregion
 	public void EndMinigame(actions a){
+		print ("Ended Minigame");
 		float r = Random.Range (0.0f, 100.0f);
-		if (r < 25){
+		print ("Ad Random Result - " + r + "  |  Random Counter Result - " + mRandomCounter);
+		switch (mRandomCounter)
+		{
+		case 0:
+			if (r < 25){
+				adButton.gameObject.SetActive (true);
+				mRandomCounter = 0;
+			} else {
+				mRandomCounter++;
+				adButton.gameObject.SetActive (false);
+			}
+			break;
+		case 1:
+			if (r < 50){
+				adButton.gameObject.SetActive (true);
+				mRandomCounter = 0;
+			} else {
+				adButton.gameObject.SetActive (false);
+				mRandomCounter++;
+			}
+			break;
+		case 2:
+			if (r < 75){
+				adButton.gameObject.SetActive (true);
+				mRandomCounter = 0;
+			} else {
+				adButton.gameObject.SetActive (false);
+				mRandomCounter++;
+			}
+			break;
+		case 3:
 			adButton.gameObject.SetActive (true);
-		} else {
-			adButton.gameObject.SetActive (false);
+			mRandomCounter = 0;
+			break;
 		}
 
+
+		PlaySound (audioThing.AMBIENT);
 		mainCam.transform.position = mainCamStartPos;
 		bottomMenuCanvasObject.SetActive (true);
 		activeScheme = controlSchemes.NONE;
@@ -1516,9 +1541,7 @@ public class Control_Script : MonoBehaviour {
 			{
 				{ "Time", System.DateTime.Now }
 			});
-		
-		print ("advertisement begun");
-
+		PlaySound (audioThing.SELECT);
 		adPanel.SetActive (true);
 		adButton.gameObject.SetActive (false);
 		AddGold ((int)(minigameGoldEarned * 0.5f));
@@ -1570,6 +1593,7 @@ public class Control_Script : MonoBehaviour {
 			{
 				{ "tier", tier }
 			});
+		PlaySound (audioThing.SELECT);
 		switch (tier)
 			{
 			case 1:
@@ -1616,6 +1640,7 @@ public class Control_Script : MonoBehaviour {
 			{
 				{ "tier", tier }
 			});
+		PlaySound (audioThing.SELECT);
 		switch (tier)
 		{
 		case 1:
@@ -1639,5 +1664,16 @@ public class Control_Script : MonoBehaviour {
 
 
 	#endregion
+
+	public IEnumerator TestIteration () {
+		yield return new WaitForSeconds (2);
+		while (true){
+			if (EventSystem.current.currentSelectedGameObject != null){
+				print (EventSystem.current.currentSelectedGameObject.name);
+			}
+
+			yield return new WaitForSeconds (0.5f);
+		}
+	}
 
 }
