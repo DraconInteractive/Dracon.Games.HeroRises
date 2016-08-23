@@ -33,19 +33,19 @@ public class MTWinScript : MonoBehaviour {
 
 	}
 
-	public void DisplayGoldValue(GameObject g, int i){
-		print ("Displaying value");
-	}
-
-	public void StopDisplayGoldValue(GameObject g, int i){
-		print ("Displaying value");
-	}
-
-	public void DisplayGemValue(GameObject g, int i){
-		print ("Displaying value");
-	}
-
-	public void StopDisplayGemValue(GameObject g, int i){
-		print ("Displaying value");
-	}
+//	public void DisplayGoldValue(GameObject g, int i){
+//		print ("Displaying value");
+//	}
+//
+//	public void StopDisplayGoldValue(GameObject g, int i){
+//		print ("Displaying value");
+//	}
+//
+//	public void DisplayGemValue(GameObject g, int i){
+//		print ("Displaying value");
+//	}
+//
+//	public void StopDisplayGemValue(GameObject g, int i){
+//		print ("Displaying value");
+//	}
 }
